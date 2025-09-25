@@ -1,0 +1,41 @@
+name menu_screens
+
+map '@'-'_' $00
+map 'a'-'z' $01
+map ' '-'?' $20
+
+line_length 20
+lines 7
+runlength_encode no
+---
+
+         A          
+                    
+       T'PAU        
+                    
+ PRODUCTION IN 1992 
+
+---
+   CODE BY DILLO    
+                    
+ INTRO-GFX BY DILLO 
+                    
+GAME-GFX BY MR.SPOCK
+                    
+  MUSIC BY PHANTOM  
+---
+  SELECT YOUR GAME 
+                    
+ F1 ...... ORIGINAL
+ F3 ..... AUTO FILL
+ F5 ..... HEX MINES
+
+ F7 .......... HELP
+---
+  ENJOY THIS SMALL  
+  CONTRIBUTION  TO  
+ YOUR ENTERTAINMENT 
+                    
+                    
+   CALM SEA AND A   
+ PROSPEROUS VOYAGE. 

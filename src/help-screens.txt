@@ -1,0 +1,98 @@
+name help_screens
+
+map '@'-'_' $00
+map 'a'-'z' $01
+map ' '-'?' $20
+
+line_length 40
+lines 14
+---
+                                        
+PRESS...                                
+                                        
+        SPC ........FOR NEXT PAGE       
+                                        
+        CR .....FOR PREVIOUS PAGE       
+                                        
+        R/S ..............TO QUIT       
+                                        
+    CONNECT A MOUSE 1351 AT PORT ONE    
+                                        
+       OR A JOYSTICK  AT PORT TWO       
+                                        
+                                     1/6
+---
+                                        
+   THE AIM OF THE GAME IS TO FIND ALL   
+                                        
+   16 MINES.  THEREFORE YOU MAY CLICK   
+                                        
+   ON  SEVERAL  FIELDS.   THE  NUMBER   
+                                        
+   WHICH APPEARS, TELLS  YOU HOW MANY   
+                                        
+   MINES ARE ON  ADJACENT FIELDS.  IF   
+                                        
+   YOU ARE SURE THAT A  CERTAIN FIELD   
+                                        
+                                     2/6
+---
+                                        
+   IS  OCCUPIED  BY  A MINE,  YOU MAY   
+                                        
+   MARK THIS FIELD WITH 'F7'  OR WITH   
+                                        
+   A CLICK ON THE RIGHT MOUSE-BUTTON.   
+                                        
+   IF YOU HAVE  MARKED ALL  16 HIDDEN   
+                                        
+   MINES, YOUR TIME  WILL BE STOPPED.   
+                                        
+   BE CAREFUL,  BECAUSE IF  YOU CLICK   
+                                        
+                                     3/6
+---
+                                        
+   ON A FIELD OCCUPIED BY A  MINE YOU   
+                                        
+   WILL  LOOSE  ONE  OF  THREE LIVES.   
+                                        
+   YOU  ARE  ALSO  ABLE  TO  REMOVE A   
+                                        
+   MARKED FIELD BY SIMPLY POINTING ON   
+                                        
+   THAT  CERTAIN  FIELD AND  PRESSING   
+                                        
+   'F7'  OR THE  RIGHT MOUSE  BUTTON.   
+                                        
+                                     4/6
+---
+                                        
+   YOU MAY CALL YOURSELF A  CHAMPION,   
+                                        
+   IF YOU ACHIEVE A TIME ...            
+                                        
+   WITH MOUSE:                          
+                                        
+   ..................UNDER ONE MINUTE   
+                                        
+   WITH JOYSTICK:                       
+                                        
+   .......UNDER ONE AND A HALF MINUTE   
+                                        
+                                     5/6
+---
+                                        
+   WELL, MAY POSEIDON BE WITH YOU...    
+                                        
+   GOOD LUCK !!!                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                     6/6

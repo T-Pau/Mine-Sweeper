@@ -1,0 +1,46 @@
+section: graphics_menu
+
+charset:
+  - 
+    name: charset_logo
+    width: 8
+    height: 8
+    count: 256
+    align: 0x800
+  -
+    name: charset_1x1
+    width: 8
+    height: 8
+    count: 256
+    align: 0x800
+  -
+    name: charset_2x2
+    width: 8
+    height: 8
+    count: 256
+    align: 0x800
+
+characters:
+  -
+    file: charset-1x1.png
+    charset: 1
+  -
+    file: charset-2x2.png
+    charset: 2
+    char-size-x: 2
+    char-size-y: 2
+
+images:
+  -
+    file: logo.png
+    pixel-size-x: 2
+    name: screen_menu
+    section: data
+    palette:
+      0x000000: 3
+      0x432B01: 1
+      0x7A3E1F: 2
+      0xA3A3A3: 0
+    charset:
+      0: 0
+      8: 1

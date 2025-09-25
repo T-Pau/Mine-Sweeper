@@ -1,0 +1,30 @@
+name screen
+page_mode objects
+
+map '@'-'_' $00
+map 'a'-'z' $01
+map ' '-'?' $20
+
+line_length 20
+lines 7
+runlength_encode no
+---                    
+won
+
+  CONGRATULATIONS!  
+                    
+    YOU CLEARED     
+    THIS FIELD.     
+  YOUR TIME: 01:18  
+                    
+    A GOOD TIME!    
+---                    
+failed
+
+     SORRY PAL!     
+                    
+     YOU FAILED     
+  IN YOUR MISSION.  
+                    
+   DON'T GIVE UP,   
+   TRY IT AGAIN!!   

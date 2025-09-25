@@ -1,0 +1,12 @@
+.include "c64-basic.target"
+
+.section graphics_menu {
+    address [
+        : $0801 - $0fff
+        : $2000 - $3fff
+    ]
+}
+
+.section graphics_game {
+    address: $4000 - $7fff
+}

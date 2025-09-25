@@ -1,0 +1,31 @@
+sources :=
+    ../Toolkit/xlr8/commodore/irq.s
+    ../Toolkit/xlr8/6502/rl-expand.s
+    ../Toolkit/xlr8/6502/utility.s
+    commands.s
+    end-screens.s
+    game.s
+    help.s
+    help-screens.s
+    irq-menu.s
+    keyboard.s
+    menu-graphics.s
+    menu-screens.s
+    mine-sweeper.s
+    music.s
+
+programs := mine-sweeper.prg
+
+default $programs
+
+build mine-sweeper.prg | mine-sweeper.prg.sym: link $sources
+    target = {{mine-sweeper.target}}
+    libs = cbm.lib c64.lib
+
+build mine-sweeper.prg.ll: vice-ll mine-sweeper.prg.sym
+
+build menu-graphics.s: convert-characters menu-graphics.yaml
+
+build help-screens.s: convert-screens help-screens.txt
+build end-screens.s: convert-screens end-screens.txt
+build menu-screens.s: convert-screens menu-screens.txt
