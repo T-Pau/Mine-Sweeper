@@ -1,3 +1,7 @@
+RND = $e09e
+RND1 = $e0be
+FAC = $61
+
 MAX_WIDTH = 10
 MAX_HEIGHT = 10
 MAX_NEIGHBORS = 8
@@ -38,7 +42,6 @@ init_field {
     ; Set borders.
     adc width
     tax
-    inx
     stx field_size
     lda #FIELD_BORDER
 :   sta gamefield - 1, x
@@ -53,7 +56,7 @@ clear_row:
     stx clear_sta + 1
     ldx width
     dex
-clear_sta
+clear_sta:
     sta gamefield,x
     dex
     bpl clear_sta
@@ -68,14 +71,13 @@ clear_sta
     stx neighbor_offsets + 1
     inx
     stx neighbor_offsets + 2
-    ldx row_span
+    lda row_span
+    tax
     stx neighbor_offsets + 3
     inx
     inx
     stx neighbor_offsets + 4
-    txa
-    clc
-    adc row_span
+    asl
     tax
     stx neighbor_offsets + 5
     inx
@@ -87,7 +89,7 @@ clear_sta
     jsr RND
 :   jsr RND1
     ; TODO: Is this byte random?
-    ldy FAC
+    ldy FAC + 3
     cpy field_size
     bcs :-
     lda gamefield,y
@@ -111,7 +113,7 @@ adjust_neighbors {
     clc
     sbc row_span
     sta source_ptr
-    lda #<gamefield
+    lda #>gamefield
     sta source_ptr + 1
 
     ldx #MAX_NEIGHBORS - 1

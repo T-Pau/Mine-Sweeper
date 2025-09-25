@@ -5,6 +5,7 @@ sources :=
     commands.s
     end-screens.s
     game.s
+    gamefield.s
     help.s
     help-screens.s
     irq-menu.s
