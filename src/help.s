@@ -82,11 +82,11 @@ enter_marquee {
 .section data
 
 keyhandler_table_help {
-    .data start_game ; fire
+    .data launch_game ; fire
     .data help_next_page ; space
-    .data start_game_original ; F1
-    .data start_game_new ; F3
-    .data start_game_hex ; F5
+    .data launch_game_original ; F1
+    .data launch_game_new ; F3
+    .data launch_game_hex ; F5
     .data $0000 ; F7 
     .data help_previous_page; return
     .data help_exit; run/stop

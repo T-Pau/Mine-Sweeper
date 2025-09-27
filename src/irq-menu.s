@@ -170,11 +170,11 @@ irq_menu_table {
 }
 
 keyhandler_table_marquee {
-    .data start_game ; fire
-    .data start_game ; space
-    .data start_game_original ; F1
-    .data start_game_new ; F3
-    .data start_game_hex ; F5
+    .data launch_game ; fire
+    .data launch_game ; space
+    .data launch_game_original ; F1
+    .data launch_game_new ; F3
+    .data launch_game_hex ; F5
     .data show_help ; F7 
 }
 

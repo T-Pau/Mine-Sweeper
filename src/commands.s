@@ -8,9 +8,9 @@ handle_command {
     lda current_command
     beq done
     asl
-    tay
-    cpy #.sizeof(command_table) + 2
+    cmp #.sizeof(command_table) + 2
     bcs done
+    tay
     lda command_table - 2,y
     sta subroutine + 1
     lda command_table - 1,y
