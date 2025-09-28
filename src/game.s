@@ -98,6 +98,7 @@ start_game {
 
     jsr clear_field_icons
     jsr display_lives_left
+    jsr display_marked_fields
 
     ldx #$03
     stx VIC_SPRITE_ENABLE
@@ -110,9 +111,42 @@ start_game {
     stx pointer_x + 1
     stx pointer_y
 
-    ; TODO: reset time
+    jsr reset_time
 
     set_irq_table game_irq_table
+    rts
+}
+
+reset_time {
+    lda #$00
+    sta CIA1_TOD_HOURS
+    sta CIA1_TOD_MINUTES
+    sta CIA1_TOD_SECONDS
+    sta CIA1_TOD_SUB_SECOND
+    rts
+}
+
+display_time {
+    lda CIA1_TOD_SECONDS
+    and #$0f
+    display_digit digits_left, 38, 21
+    lda CIA1_TOD_SECONDS
+    lsr
+    lsr
+    lsr
+    lsr
+    display_digit digits_left, 37, 21
+    lda CIA1_TOD_MINUTES
+    and #$0f
+    display_digit digits_right, 35, 21
+    lda CIA1_TOD_MINUTES
+    lsr
+    lsr
+    lsr
+    lsr
+    bne :+
+    lda #DIGIT_EMPTY
+:   display_digit digits_right, 34, 21
     rts
 }
 
@@ -122,9 +156,28 @@ display_lives_left {
     rts
 }
 
+display_marked_fields {
+    lda marked_fields
+    ldx #0
+:   cmp #10
+    bcc done
+    sec
+    sbc #10
+    inx
+    bne :-
+done:
+    stx tens + 1
+    display_digit digits_left, 38, 23
+tens:
+    lda #$00
+    bne :+
+    lda #DIGIT_EMPTY
+:   display_digit digits_left, 37, 23        
+}
+
 game_irq {
     jsr music_play
-    ; TODO: update time
+    jsr display_time
     jsr handle_input
     rts
 }
