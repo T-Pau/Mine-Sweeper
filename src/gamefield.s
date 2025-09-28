@@ -138,7 +138,7 @@ loop:
 check_win {
     lda marked_fields
     cmp marked_mines
-    bne end
+    bne :+
     cmp mines
 :   rts    
 }
