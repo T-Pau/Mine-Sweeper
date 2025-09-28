@@ -2,15 +2,44 @@ GAME_ORIGINAL = 0
 GAME_NEW = 1
 GAME_HEX = 2
 
+GAME_BITMAP_OFFSET(xx, yy) = game_bitmap + xx * 8 + yy * $140
+
+; Display digit in bitmap.
+; Arguments:
+;   A: digit
+;   digits: graphics to use
+;   xx: x coordinate to display at
+;   yy: y coordinate to display at
+.macro display_digit digits, xx, yy {
+    asl
+    asl
+    asl
+    tax
+    ldy #0
+:   lda digits,x
+    sta GAME_BITMAP_OFFSET(xx, yy),y
+    inx
+    iny
+    cpy #8
+    bne :-
+}
+
 .section code
 
 launch_game {
     set_bottom_next_action launch_game_faded_out
     set_bottom_action menu_fade_out
+    set_command COMMAND_PREPARE_GAME
     rts
 }
 
 launch_game_faded_out {
+    set_bottom_next_action launch_game_done
+    set_bottom_action wait_for_command
+    rts
+}
+
+launch_game_done {
     lda #COMMAND_START_GAME
     sta current_command
     set_irq_table music_irq_table
@@ -36,6 +65,16 @@ launch_game_hex {
     jmp launch_game
 }
 
+prepare_game {
+    ; TODO: Take parameters from game_mode.
+    lda #3
+    sta lives_left
+    lda #$16
+    ldx #10
+    ldy #10
+    jmp init_field
+}
+
 start_game {
     lda #COLOR_BLACK
     sta VIC_BACKGROUND_COLOR
@@ -57,12 +96,8 @@ start_game {
     dex
     bne :-
 
-    ; TODO: Take parameters from game_mode.
-    lda #$16
-    ldx #10
-    ldy #10
-    jsr init_field
-
+    jsr clear_field_icons
+    jsr display_lives_left
 
     ldx #$03
     stx VIC_SPRITE_ENABLE
@@ -75,12 +110,21 @@ start_game {
     stx pointer_x + 1
     stx pointer_y
 
+    ; TODO: reset time
+
     set_irq_table game_irq_table
+    rts
+}
+
+display_lives_left {
+    lda lives_left
+    display_digit digits_left, 38, 19
     rts
 }
 
 game_irq {
     jsr music_play
+    ; TODO: update time
     jsr handle_input
     rts
 }
@@ -117,6 +161,72 @@ set_x:
     rts
 }
 
+; Clear displayed playing field.
+clear_field_icons {
+    ldx #0
+    stx current_x + 1
+    stx current_y + 1
+current_x:    
+    ldx #$00
+current_y:
+    ldy #$0a
+    lda #ICON_EMPTY
+    jsr display_field_icon
+    ldx current_x + 1
+    inx
+    stx current_x + 1
+    cpx width
+    bne current_x
+    ldx #$00
+    stx current_x + 1
+    ldy current_y + 1
+    iny
+    sty current_y + 1
+    cpy height
+    bne current_y
+    rts
+}
+
+; Display icon for field.
+; Arguments:
+;   A: icon index
+;   X: X coordinate
+;   Y: Y coordinate
+display_field_icon {
+    asl a
+    asl a
+    asl a
+    asl a
+    sta icon_offset + 1
+    lda field_x_offset,x
+    clc
+    adc field_y_low,y
+    sta destination_up + 1
+    lda field_y_high,y
+    adc #$00
+    sta destination_up + 2
+    lda destination_up + 1
+    clc
+    adc #$40
+    sta destination_down + 1
+    lda destination_up + 2
+    adc #$01
+    sta destination_down + 2
+icon_offset:
+    ldx #$00
+    ldy #$00
+:   lda field_icons,x
+destination_up:
+    sta game_bitmap,y
+    lda field_icons + .sizeof(field_icons)/2,x
+destination_down:
+    sta game_bitmap,y
+    inx
+    iny
+    cpy #$10
+    bne :-
+    rts
+}
 
 .section data
 
@@ -129,6 +239,25 @@ music_irq_table {
     .data SCREEN_TOP:2, music_play
 }
 
+field_x_offset {
+    .repeat xx, 10 {
+        .data $20 + xx * $10
+    }
+}
+
+field_y_low {
+    .repeat yy, 10 {
+        .data <(game_bitmap + $3c0 + yy * $280):1
+    }
+}   
+
+field_y_high {
+    .repeat yy, 10 {
+        .data >(game_bitmap + $3c0 + yy * $280):1
+    }
+}   
+
 .section reserved
 
 game_mode .reserve 1
+lives_left .reserve 1

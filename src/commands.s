@@ -1,8 +1,14 @@
 COMMAND_START_GAME = 1
 COMMAND_COPY_HELP_SCREEN = 2
 COMMAND_SHOW_MARQUEE = 3
+COMMAND_PREPARE_GAME = 4
 
 .section code
+
+.macro set_command command {
+    lda #command
+    sta current_command
+}
 
 handle_command {
     lda current_command
@@ -30,6 +36,7 @@ command_table {
     .data start_game
     .data copy_help_screen
     .data show_marquee
+    .data prepare_game
 }
 
 .section reserved
