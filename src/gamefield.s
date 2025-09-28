@@ -100,6 +100,8 @@ clear_sta:
     jsr adjust_neighbors
     dec marked_mines
     bne :-
+    lda #0
+    sta marked_fields
     rts
 }
 
@@ -130,6 +132,16 @@ loop:
     rts
 }
 
+; Check if game is won.
+; Returns:
+;   Z: set if won
+check_win {
+    lda marked_fields
+    cmp marked_mines
+    bne end
+    cmp mines
+:   rts    
+}
 
 .section reserved
 

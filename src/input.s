@@ -4,7 +4,23 @@ handle_input {
     jsr read_mouse
     jsr read_joystick
     jsr update_pointer
-    ; TODO: handle buttons
+    lda previous_buttons
+    ldx buttons
+    stx previous_buttons
+    beq end
+    eor #$03
+    and buttons
+    beq end
+    sta restore + 1
+    jsr pointer_to_index
+    beq end
+restore:
+    lda #0
+    lsr
+    bcc :+
+    jmp handle_left_click
+:   jmp handle_right_click
+end:
     rts
 }
 
@@ -158,3 +174,4 @@ last_poty .reserve 1
 pointer_x .reserve 2
 pointer_y .reserve 1
 buttons .reserve 1
+previous_buttons .reserve 1

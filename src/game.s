@@ -172,13 +172,117 @@ tens:
     lda #$00
     bne :+
     lda #DIGIT_EMPTY
-:   display_digit digits_left, 37, 23        
+:   display_digit digits_left, 37, 23  
+    rts      
 }
 
 game_irq {
     jsr music_play
     jsr display_time
     jsr handle_input
+    rts
+}
+
+; Handle left click on field X.
+; Arguments:
+;   X: field index
+handle_left_click {
+    lda gamefield,x
+    tay
+    cmp #FIELD_MARKED
+    bcs end
+    ora #FIELD_REVEALED
+    sta gamefield,x
+    and #FIELD_MINE
+    bne explode
+    tya
+display:
+    ldx current_field_x
+    ldy current_field_y
+    jmp display_field_icon
+
+explode:
+    dec lives_left
+    jsr display_lives_left
+    ; TODO: trigger explosion
+    lda #ICON_SKULL
+    bne display
+end:
+    rts
+}
+
+; Handle right click on field X.
+; Arguments:
+;   X: field index
+handle_right_click {
+    lda gamefield,x
+    bmi end
+    eor #FIELD_MARKED
+    sta gamefield,x
+    cmp #FIELD_MARKED
+    bcs mark
+    ; Unmark field
+    dec marked_fields
+    and #FIELD_MINE
+    beq :+
+    dec marked_mines
+:   lda #ICON_EMPTY
+    bne update
+mark:
+    inc marked_fields
+    and #FIELD_MINE
+    beq :+
+    inc marked_mines
+:   lda #ICON_FLAG
+update:
+    ldx current_field_x
+    ldy current_field_y
+    jsr display_field_icon
+    jsr display_marked_fields
+    jsr check_win
+    bne end
+    ; TODO: Trigger game won.
+end:
+    rts
+}
+
+; Convert pointer coordinates to gamefield index.
+; Returns:
+;   X: index
+;   Z: set if pointer outside gamefield.
+;   current_field_x: x coordinate of field.
+;   current_field_y: y coordinate of field.
+pointer_to_index {
+    lda pointer_y
+    sec
+    sbc #$4a
+    lsr
+    lsr
+    lsr
+    lsr
+    cmp height
+    bcs invalid
+    sta current_field_y
+    tay
+
+    ldx pointer_x + 1
+    bne invalid
+    lda pointer_x
+    sec
+    sbc #$38
+    lsr
+    lsr
+    lsr
+    lsr
+    cmp width
+    bcs invalid
+    sta current_field_x
+    clc
+    adc gamefield_row_offsets,y
+    tax
+    rts
+invalid:
+    ldx #0
     rts
 }
 
@@ -314,3 +418,6 @@ field_y_high {
 
 game_mode .reserve 1
 lives_left .reserve 1
+
+current_field_x .reserve 1
+current_field_y .reserve 1
