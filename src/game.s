@@ -69,7 +69,7 @@ prepare_game {
     ; TODO: Take parameters from game_mode.
     lda #3
     sta lives_left
-    lda #$16
+    lda #16
     ldx #10
     ldy #10
     jmp init_field
@@ -114,6 +114,51 @@ start_game {
     jsr reset_time
 
     set_irq_table game_irq_table
+    rts
+}
+
+game_won {
+    lda CIA1_TOD_SECONDS
+    tax
+    and #$f
+    ora #$30
+    sta screen_won + $61
+    txa
+    lsr
+    lsr
+    lsr
+    lsr
+    ora #$30
+    sta screen_won + $60
+    lda CIA1_TOD_MINUTES
+    tax
+    and #$f
+    ora #$30
+    sta screen_won + $5e
+    txa
+    lsr
+    lsr
+    lsr
+    lsr
+    ; TODO: Space instead of leading 0?
+    ora #$30
+    sta screen_won + $5d
+    lda #<screen_won
+    ldy #>screen_won
+    jmp end_game
+}
+
+game_lost {
+    lda #<screen_failed
+    ldy #>screen_failed
+    jmp end_game
+}
+
+end_game {
+    jsr copy_2x2_screen
+    set_bottom_action menu_fade_in
+    set_bottom_next_action menu_marquee_faded_in
+    jsr setup_menu
     rts
 }
 
@@ -202,8 +247,19 @@ display:
     jmp display_field_icon
 
 explode:
+    dec mines
     dec lives_left
-    jsr display_lives_left
+    ; TODO: Delay game end after explosion animation finishes.
+    bne :+
+    lda #KEY_FIRE
+    sta last_key
+    set_command COMMAND_GAME_LOST
+:   jsr check_win
+    bne :+
+    lda #KEY_FIRE
+    sta last_key
+    set_command COMMAND_GAME_WON
+:   jsr display_lives_left
     ; TODO: trigger explosion
     lda #ICON_SKULL
     bne display
@@ -241,7 +297,9 @@ update:
     jsr display_marked_fields
     jsr check_win
     bne end
-    ; TODO: Trigger game won.
+    lda #KEY_F7
+    sta last_key
+    set_command COMMAND_GAME_WON
 end:
     rts
 }

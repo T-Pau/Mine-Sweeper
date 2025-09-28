@@ -19,10 +19,9 @@ destination_ptr .reserve 2
     sta last_key
     sta current_key
     jsr setup_menu
+    jsr menu_marquee_faded_out
     jsr init_irq
-main_loop:
-    jsr handle_command
-    jmp main_loop
+    jmp command_loop
 }
 
 TEXT_SCREEN_START = SCREEN_RAM + 11 * 40
@@ -102,6 +101,10 @@ line_count:
 }
 
 setup_menu {
+    set_vic_bank $0000
+    set_vic_text_mode
+    lda #0
+    sta VIC_SPRITE_ENABLE
     ldx #COLOR_BLACK
     stx VIC_BORDER_COLOR
     stx VIC_BACKGROUND_COLOR
@@ -123,16 +126,15 @@ setup_menu {
     sta COLOR_RAM + 11 * 40 + 419,x
     dex
     bne :-
-    set_irq_table irq_menu_table
+    rl_expand SCREEN_RAM, screen_menu
     jsr show_marquee
+    set_irq_table irq_menu_table
     lda #0
     sta menu_fade_index
-    jsr menu_marquee_faded_out
     rts
 }
 
 show_marquee {
-    rl_expand SCREEN_RAM, screen_menu
     lda #VIC_VIDEO_ADDRESS(SCREEN_RAM, charset_2x2)
     sta text_charset
     set_keyhandler_table keyhandler_table_marquee
