@@ -1,26 +1,23 @@
 .section code
 
-handle_input {
+.public BUTTON_LEFT = $01
+.public BUTTON_RIGHT = $02
+
+; Reads mouse and joystick.
+; Result:
+;   pointer_x: new x position
+;   pointer_y: new y position
+;   buttons: buttons newly pressed
+.public read_input {
     jsr read_mouse
     jsr read_joystick
     jsr update_pointer
     lda previous_buttons
     ldx buttons
     stx previous_buttons
-    beq end
     eor #$03
     and buttons
-    beq end
-    sta restore + 1
-    jsr pointer_to_index
-    beq end
-restore:
-    lda #0
-    lsr
-    bcc :+
-    jmp handle_left_click
-:   jmp handle_right_click
-end:
+    sta buttons
     rts
 }
 
@@ -168,10 +165,10 @@ right_done:
 
 .section reserved
 
+.public pointer_x .reserve 2
+.public pointer_y .reserve 1
+.public buttons .reserve 1
+
 last_potx .reserve 1
 last_poty .reserve 1
-
-pointer_x .reserve 2
-pointer_y .reserve 1
-buttons .reserve 1
 previous_buttons .reserve 1

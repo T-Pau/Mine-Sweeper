@@ -162,6 +162,26 @@ end_game {
     rts
 }
 
+handle_input {
+    jsr read_input
+    jsr update_pointer
+
+    ; Handle button clicks.
+    lda current_command
+    bne done
+    ; TODO: skip if explosion in progress
+    lda buttons
+    beq done
+    jsr pointer_to_index
+    lda buttons
+    lsr
+    bcc :+
+    jmp handle_left_click
+:   jmp handle_right_click
+done:
+    rts
+}
+
 reset_time {
     lda #$00
     sta CIA1_TOD_HOURS
