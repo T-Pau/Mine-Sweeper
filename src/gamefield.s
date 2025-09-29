@@ -25,7 +25,6 @@ init_field {
     stx width
     sty height
     inx
-    inx
     stx row_span
 
     ; Calculate row offsets.
@@ -33,36 +32,43 @@ init_field {
     txa
     ldy #0
     clc
-:   sta gamefield_row_offsets, y
+:   sta gamefield_row_offsets,y
     adc row_span
     iny 
     cpy height
     bne :-
-
-    ; Set borders.
-    adc width
-    tax
-    stx field_size
-    lda #FIELD_BORDER
-:   sta gamefield - 1, x
-    dex
-    bne :-
+    adc row_span
+    sta field_size
 
     ; Clear field.
-    ldy #0
+    tax
     lda #0
-clear_row:
-    ldx gamefield_row_offsets,y
-    stx clear_sta + 1
-    ldx width
-    dex
-clear_sta:
+:   dex
     sta gamefield,x
-    dex
-    bpl clear_sta
+    bne :-
+
+    ; Set top and bottom borders.
+    ldy field_size
+    dey
+    ldx #0
+    lda #FIELD_BORDER
+:   sta gamefield,x
+    sta gamefield,y
+    dey
+    inx
+    cpx row_span
+    bne :-
+    sta gamefield,y
+    dey
+    sta gamefield,y
+
+    ; Set side border.
+    ldy #0
+:   ldx gamefield_row_offsets,y
+    sta gamefield - 1,x
     iny
     cpy height
-    bne clear_row
+    bne :-
 
     ; Calculate neighbors.
     ldx #0
@@ -88,7 +94,6 @@ clear_sta:
     ; Set mines.
     jsr RND
 :   jsr RND1
-    ; TODO: Is this byte random?
     ldy FAC + 3
     cpy field_size
     bcs :-
