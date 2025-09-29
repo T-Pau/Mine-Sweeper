@@ -4,6 +4,11 @@ GAME_HEX = 2
 
 GAME_BITMAP_OFFSET(xx, yy) = game_bitmap + xx * 8 + yy * $140
 
+; XLR8: this should be a function, but that doesn't get evaluated 
+.macro sprite_pointer address, offset = 0 {
+    .data (address / 64) & $ff + offset:1
+}
+
 ; Display digit in bitmap.
 ; Arguments:
 ;   A: digit
@@ -102,7 +107,7 @@ start_game {
 
     ldx #$03
     stx VIC_SPRITE_ENABLE
-    ldx #$01
+    ldx #COLOR_WHITE
     stx VIC_SPRITE_0_COLOR
     dex
     stx VIC_SPRITE_1_COLOR
@@ -111,7 +116,18 @@ start_game {
     stx pointer_x + 1
     stx pointer_y
 
+    lda #COLOR_RED
+    sta VIC_SPRITE_2_COLOR
+    lda #COLOR_BROWN
+    sta VIC_SPRITE_MULTICOLOR_0
+    lda #COLOR_YELLOW
+    sta VIC_SPRITE_MULTICOLOR_1
+    lda #$04
+    sta VIC_SPRITE_MULTICOLOR
+
     jsr reset_time
+    ldx #$ff
+    stx animation_index
 
     set_irq_table game_irq_table
     rts
@@ -169,7 +185,8 @@ handle_input {
     ; Handle button clicks.
     lda current_command
     bne done
-    ; TODO: skip if explosion in progress
+    lda animation_index
+    bpl done
     lda buttons
     beq done
     jsr pointer_to_index
@@ -245,6 +262,67 @@ game_irq {
     jsr music_play
     jsr display_time
     jsr handle_input
+    jsr handle_animation
+    rts
+}
+
+start_animation {
+    lda #0
+    sta animation_index
+    lda #7
+    sta VIC_SPRITE_ENABLE
+    lda current_field_x
+    asl
+    asl
+    asl
+    asl
+    clc
+    adc #$38
+    sta VIC_SPRITE_2_X
+    lda current_field_y
+    asl
+    asl
+    asl
+    asl
+    clc
+    adc #$4a
+    sta VIC_SPRITE_2_Y
+    jmp handle_animation
+}
+
+handle_animation {
+    ldx animation_index
+    cpx #$ff
+    beq end
+    cpx #.sizeof(animation_sprite)
+    bcc :+
+    ldx #$ff
+    stx animation_index
+    lda #3
+    sta VIC_SPRITE_ENABLE
+    jmp animation_done
+
+:   lda animation_sprite,x
+    sta game_screen + $3fa
+    inx
+    stx animation_index
+end:
+    rts
+}
+
+animation_done {
+    lda lives_left
+    bne :+
+    lda #COMMAND_GAME_LOST
+    bne game_end
+:   jsr check_win
+    bne done
+    lda #COMMAND_GAME_WON
+game_end:
+    sta current_command
+    lda #KEY_FIRE
+    sta last_key
+done:
     rts
 }
 
@@ -269,18 +347,8 @@ display:
 explode:
     dec mines
     dec lives_left
-    ; TODO: Delay game end after explosion animation finishes.
-    bne :+
-    lda #KEY_FIRE
-    sta last_key
-    set_command COMMAND_GAME_LOST
-:   jsr check_win
-    bne :+
-    lda #KEY_FIRE
-    sta last_key
-    set_command COMMAND_GAME_WON
-:   jsr display_lives_left
-    ; TODO: trigger explosion
+    jsr display_lives_left
+    jsr start_animation
     lda #ICON_SKULL
     bne display
 end:
@@ -492,6 +560,14 @@ field_y_high {
     }
 }   
 
+animation_sprite {
+    .repeat i, 9 {
+        sprite_pointer explosion_sprite, i
+        sprite_pointer explosion_sprite, i
+        sprite_pointer explosion_sprite, i
+    }
+}
+
 .section reserved
 
 game_mode .reserve 1
@@ -499,3 +575,5 @@ lives_left .reserve 1
 
 current_field_x .reserve 1
 current_field_y .reserve 1
+
+animation_index .reserve 1

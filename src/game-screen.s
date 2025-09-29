@@ -8,8 +8,9 @@ game_screen .align $400 {
     .binary_file "game-screen.prg" .start 2
     .data 0, 0, 0, 0, 0, 0, 0, 0
     .data 0, 0, 0, 0, 0, 0, 0, 0
-    .data <(pointer_sprite / 64):1
-    .data <(pointer_sprite / 64) + 1:1
+    sprite_pointer pointer_sprite
+    sprite_pointer pointer_sprite, 1
+    .data 0, 0, 0, 0, 0, 0
 }
 
 .section data

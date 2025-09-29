@@ -4,6 +4,7 @@ sources :=
     ../Toolkit/xlr8/6502/utility.s
     commands.s
     end-screens.s
+    explosion.s
     game.s
     gamefield.s
     game-screen.s
@@ -36,3 +37,6 @@ build menu-screens.s: convert-screens menu-screens.txt
 build pointer.s: convert-sprites pointer.png
     flags = --section graphics_game --align
     name = pointer_sprite
+build explosion.s: convert-sprites explosion.png
+    flags = --section graphics_game --align --multicolor --palette ff000000,432b01,6d242b,e9f15e
+    name = explosion_sprite
