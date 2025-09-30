@@ -316,21 +316,19 @@ start_animation {
     sta animation_index
     lda #7
     sta VIC_SPRITE_ENABLE
-    lda current_field_x
-    asl
-    asl
-    asl
-    asl
+    lda pointer_x
+    sec
+    sbc #$18
+    and #$f0
     clc
-    adc #$38
+    adc #$18
     sta VIC_SPRITE_2_X
-    lda current_field_y
-    asl
-    asl
-    asl
-    asl
+    lda pointer_y
+    sec
+    sbc #$3a
+    and #$f0
     clc
-    adc #$4a
+    adc #$3a
     sta VIC_SPRITE_2_Y
     jmp handle_animation
 }
@@ -436,8 +434,6 @@ end:
 ; Returns:
 ;   X: index
 ;   Z: set if pointer outside gamefield.
-;   current_field_x: x coordinate of field.
-;   current_field_y: y coordinate of field.
 pointer_to_index {
     lda pointer_y
     sec
@@ -448,7 +444,6 @@ pointer_to_index {
     lsr
     cmp height
     bcs invalid
-    sta current_field_y
     tay
 
     ldx pointer_x + 1
@@ -462,7 +457,6 @@ pointer_to_index {
     lsr
     cmp width
     bcs invalid
-    sta current_field_x
     clc
     adc gamefield_row_offsets,y
     tax
@@ -585,8 +579,5 @@ lives_left .reserve 1
 field_position_low .reserve MAX_GAMEFIELD_SIZE
 field_position_high .reserve MAX_GAMEFIELD_SIZE
 
-current_field_x .reserve 1
-current_field_y .reserve 1
-
-
 animation_index .reserve 1
+
