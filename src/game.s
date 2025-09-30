@@ -1,6 +1,3 @@
-GAME_ORIGINAL = 0
-GAME_NEW = 1
-GAME_HEX = 2
 
 GAME_BITMAP_OFFSET(xx, yy) = game_bitmap + xx * 8 + yy * $140
 FIELD_POSITION_START = GAME_BITMAP_OFFSET(4, 3)
@@ -54,25 +51,23 @@ launch_game_done {
 
 
 launch_game_original {
-    lda #GAME_ORIGINAL
-    sta game_mode
+    lda #0
+    sta do_reveal_zeros
     jmp launch_game
 }
 
 launch_game_new {
-    lda #GAME_NEW
-    sta game_mode
+    lda #1
+    sta do_reveal_zeros
     jmp launch_game
 }
 
 launch_game_hex {
-    lda #GAME_HEX
-    sta game_mode
-    jmp launch_game
+    rts
 }
 
 prepare_game {
-    ; TODO: Take parameters from game_mode.
+    ; TODO: Don't hardcode parameters.
     lda #3
     sta lives_left
     lda #16
@@ -382,7 +377,15 @@ handle_left_click {
     and #FIELD_MINE
     bne explode
     tya
-    jmp display_field_icon
+    bne :+
+    ldy do_reveal_zeros
+    beq :+
+    stx reveal_zero_stack
+    ldy #1
+    sty reveal_zero_index
+    ldy #COMMAND_REVEAL_ZERO
+    sty current_command
+:   jmp display_field_icon
 
 explode:
     dec mines
@@ -429,6 +432,49 @@ update:
 end:
     rts
 }
+
+; Reveal all neighboring zeros and their neighbors.
+reveal_zero {
+    ldy reveal_zero_index
+    dey
+    lda reveal_zero_stack,y
+    sty reveal_zero_index
+    clc
+    sbc row_span
+    sta offset + 1
+    ldy #0
+neighbor_loop:
+    lda neighbor_offsets,y
+    clc
+offset:
+    adc #0
+    tax
+    lda gamefield,x
+    bmi next_neighbor
+    ora #FIELD_REVEALED
+    sta gamefield,x
+    and #$0f
+    bne :+
+    txa
+    ldx reveal_zero_index
+    sta reveal_zero_stack,x
+    inx
+    stx reveal_zero_index
+    tax
+    lda #0
+:   sty restore + 1
+    jsr display_field_icon
+restore:
+    ldy #0
+next_neighbor:
+    iny
+    cpy #8
+    bne neighbor_loop
+    lda reveal_zero_index
+    bne reveal_zero
+    rts
+}
+
 
 ; Convert pointer coordinates to gamefield index.
 ; Returns:
@@ -573,11 +619,15 @@ animation_sprite {
 
 .section reserved
 
-game_mode .reserve 1
+do_reveal_zeros .reserve 1
 lives_left .reserve 1
 
 field_position_low .reserve MAX_GAMEFIELD_SIZE
 field_position_high .reserve MAX_GAMEFIELD_SIZE
 
 animation_index .reserve 1
+
+
+reveal_zero_stack .reserve MAX_WIDTH * MAX_HEIGHT
+reveal_zero_index .reserve 1 ; Points to first free element in reveal_zero_stack.
 

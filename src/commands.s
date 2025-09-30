@@ -4,6 +4,7 @@ COMMAND_SHOW_MARQUEE = 3
 COMMAND_PREPARE_GAME = 4
 COMMAND_GAME_WON = 5
 COMMAND_GAME_LOST = 6
+COMMAND_REVEAL_ZERO = 7
 
 .section code
 
@@ -40,6 +41,7 @@ command_table {
     .data prepare_game
     .data game_won
     .data game_lost
+    .data reveal_zero
 }
 
 .section reserved

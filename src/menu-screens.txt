@@ -26,11 +26,11 @@ GAME-GFX BY MR.SPOCK
 ---
   SELECT YOUR GAME 
                     
- F1 ...... ORIGINAL
- F3 ..... AUTO FILL
- F5 ..... HEX MINES
+F1 ........ ORIGINAL
+F3 ... REVEAL ZEROES
+F5 ....... HEX MINES
 
- F7 .......... HELP
+F7 ............ HELP
 ---
   ENJOY THIS SMALL  
   CONTRIBUTION  TO  

@@ -17,6 +17,7 @@ tmp .reserve 1
     jsr music_init
     lda #0
     sta current_command
+    sta do_reveal_zeros
     sta last_key
     sta current_key
     jsr setup_menu
