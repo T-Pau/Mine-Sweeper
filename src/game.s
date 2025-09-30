@@ -3,6 +3,7 @@ GAME_NEW = 1
 GAME_HEX = 2
 
 GAME_BITMAP_OFFSET(xx, yy) = game_bitmap + xx * 8 + yy * $140
+FIELD_POSITION_START = GAME_BITMAP_OFFSET(4, 3)
 
 ; XLR8: this should be a function, but that doesn't get evaluated 
 .macro sprite_pointer address, offset = 0 {
@@ -77,7 +78,8 @@ prepare_game {
     lda #16
     ldx #10
     ldy #10
-    jmp init_field
+    jsr init_field
+    jmp compute_field_positions
 }
 
 start_game {
@@ -130,6 +132,48 @@ start_game {
     stx animation_index
 
     set_irq_table game_irq_table
+    rts
+}
+
+compute_field_positions {
+    lda #<FIELD_POSITION_START
+    sta source_ptr
+    sta destination_ptr
+    lda #>FIELD_POSITION_START
+    sta source_ptr + 1
+    sta destination_ptr + 1
+    ldy height
+    sty tmp
+    ldy row_span
+    iny
+row_loop:
+    ldx #0
+column_loop:
+    lda source_ptr
+    sta field_position_low,y
+    clc
+    adc #16
+    sta source_ptr
+    lda source_ptr + 1
+    sta field_position_high,y
+    adc #0
+    sta source_ptr + 1
+    iny
+    inx
+    cpx width
+    bne column_loop
+    lda destination_ptr
+    clc
+    adc #<640
+    sta destination_ptr
+    sta source_ptr
+    lda destination_ptr + 1
+    adc #>640
+    sta source_ptr + 1
+    sta destination_ptr + 1
+    iny
+    dec tmp
+    bne row_loop
     rts
 }
 
@@ -190,6 +234,7 @@ handle_input {
     lda buttons
     beq done
     jsr pointer_to_index
+    beq done
     lda buttons
     lsr
     bcc :+
@@ -339,18 +384,15 @@ handle_left_click {
     and #FIELD_MINE
     bne explode
     tya
-display:
-    ldx current_field_x
-    ldy current_field_y
     jmp display_field_icon
 
 explode:
     dec mines
     dec lives_left
+    lda #ICON_SKULL
+    jsr display_field_icon
     jsr display_lives_left
     jsr start_animation
-    lda #ICON_SKULL
-    bne display
 end:
     rts
 }
@@ -379,8 +421,6 @@ mark:
     inc marked_mines
 :   lda #ICON_FLAG
 update:
-    ldx current_field_x
-    ldy current_field_y
     jsr display_field_icon
     jsr display_marked_fields
     jsr check_win
@@ -466,54 +506,41 @@ set_x:
 
 ; Clear displayed playing field.
 clear_field_icons {
-    ldx #0
-    stx current_x + 1
-    stx current_y + 1
-current_x:    
-    ldx #$00
-current_y:
-    ldy #$0a
+    ldx gamefield_size
+    dex
+loop:
+    lda gamefield,x
+    cmp #FIELD_BORDER
+    beq next
     lda #ICON_EMPTY
+    stx restore + 1
     jsr display_field_icon
-    ldx current_x + 1
-    inx
-    stx current_x + 1
-    cpx width
-    bne current_x
-    ldx #$00
-    stx current_x + 1
-    ldy current_y + 1
-    iny
-    sty current_y + 1
-    cpy height
-    bne current_y
+restore:    
+    ldx #0
+next:    
+    dex
+    bne loop
     rts
 }
 
 ; Display icon for field.
 ; Arguments:
 ;   A: icon index
-;   X: X coordinate
-;   Y: Y coordinate
+;   X: field index
 display_field_icon {
     asl a
     asl a
     asl a
     asl a
     sta icon_offset + 1
-    lda field_x_offset,x
-    clc
-    adc field_y_low,y
+    lda field_position_low,x
     sta destination_up + 1
-    lda field_y_high,y
-    adc #$00
-    sta destination_up + 2
-    lda destination_up + 1
     clc
-    adc #$40
+    adc #<320
     sta destination_down + 1
-    lda destination_up + 2
-    adc #$01
+    lda field_position_high,x
+    sta destination_up + 2
+    adc #>320
     sta destination_down + 2
 icon_offset:
     ldx #$00
@@ -542,24 +569,6 @@ music_irq_table {
     .data SCREEN_TOP:2, music_play
 }
 
-field_x_offset {
-    .repeat xx, 10 {
-        .data $20 + xx * $10
-    }
-}
-
-field_y_low {
-    .repeat yy, 10 {
-        .data <(game_bitmap + $3c0 + yy * $280):1
-    }
-}   
-
-field_y_high {
-    .repeat yy, 10 {
-        .data >(game_bitmap + $3c0 + yy * $280):1
-    }
-}   
-
 animation_sprite {
     .repeat i, 9 {
         sprite_pointer explosion_sprite, i
@@ -573,7 +582,11 @@ animation_sprite {
 game_mode .reserve 1
 lives_left .reserve 1
 
+field_position_low .reserve MAX_GAMEFIELD_SIZE
+field_position_high .reserve MAX_GAMEFIELD_SIZE
+
 current_field_x .reserve 1
 current_field_y .reserve 1
+
 
 animation_index .reserve 1

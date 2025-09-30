@@ -6,6 +6,7 @@ IRQ_END = $ea31
 
 source_ptr .reserve 2
 destination_ptr .reserve 2
+tmp .reserve 1
 
 .section code
 

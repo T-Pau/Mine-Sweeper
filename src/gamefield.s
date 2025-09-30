@@ -5,6 +5,7 @@ FAC = $61
 MAX_WIDTH = 10
 MAX_HEIGHT = 10
 MAX_NEIGHBORS = 8
+MAX_GAMEFIELD_SIZE = (MAX_WIDTH + 1) * (MAX_HEIGHT + 2) + 2
 
 FIELD_REVEALED = $80
 FIELD_MARKED = $40
@@ -38,7 +39,7 @@ init_field {
     cpy height
     bne :-
     adc row_span
-    sta field_size
+    sta gamefield_size
 
     ; Clear field.
     tax
@@ -48,7 +49,7 @@ init_field {
     bne :-
 
     ; Set top and bottom borders.
-    ldy field_size
+    ldy gamefield_size
     dey
     ldx #0
     lda #FIELD_BORDER
@@ -95,7 +96,7 @@ init_field {
     jsr RND
 :   jsr RND1
     ldy FAC + 3
-    cpy field_size
+    cpy gamefield_size
     bcs :-
     lda gamefield,y
     and #$f0
@@ -150,10 +151,10 @@ check_win {
 
 .section reserved
 
-gamefield .reserve (MAX_WIDTH + 2) * (MAX_HEIGHT + 2) .align $100
+gamefield .reserve MAX_GAMEFIELD_SIZE .align $100
 gamefield_row_offsets .reserve MAX_HEIGHT
 row_span .reserve 1
-field_size .reserve 1
+gamefield_size .reserve 1
 
 neighbor_offsets .reserve MAX_NEIGHBORS
 
