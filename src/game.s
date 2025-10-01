@@ -74,7 +74,11 @@ prepare_game {
     ldx #10
     ldy #10
     jsr init_field
-    jmp compute_field_positions
+    jsr compute_field_positions
+    jsr clear_field_icons
+    jsr display_lives_left
+    jsr display_marked_fields
+    rts
 }
 
 start_game {
@@ -97,10 +101,6 @@ start_game {
     sta COLOR_RAM + 749,x
     dex
     bne :-
-
-    jsr clear_field_icons
-    jsr display_lives_left
-    jsr display_marked_fields
 
     ldx #$03
     stx VIC_SPRITE_ENABLE
