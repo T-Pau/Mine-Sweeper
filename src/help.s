@@ -37,6 +37,7 @@ copy_help_screen {
     jmp rl_expand
 }
 
+
 help_next_page {
     ldx current_help_page
     inx
@@ -69,7 +70,7 @@ help_exit {
 }
 
 enter_marquee {
-    set_keyhandler_table keyhandler_table_marquee
+    set_keyhandler_table keyhandler_table_menu
     lda #VIC_VIDEO_ADDRESS(SCREEN_RAM, charset_2x2)
     sta text_charset
     lda #COMMAND_SHOW_MARQUEE
@@ -82,12 +83,12 @@ enter_marquee {
 .section data
 
 keyhandler_table_help {
-    .data launch_game ; fire
+    .data enter_start_game ; fire
     .data help_next_page ; space
-    .data launch_game_original ; F1
-    .data launch_game_new ; F3
-    .data launch_game_hex ; F5
-    .data $0000 ; F7 
+    .data help_exit ; F1
+    .data $0000 ; F3
+    .data $0000 ; F5
+    .data enter_start_game ; F7 
     .data help_previous_page; return
     .data help_exit; run/stop
 }

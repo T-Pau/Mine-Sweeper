@@ -169,13 +169,13 @@ irq_menu_table {
     .data SCREEN_TOP + 25 * 8:2, irq_menu_bottom
 }
 
-keyhandler_table_marquee {
-    .data launch_game ; fire
-    .data launch_game ; space
-    .data launch_game_original ; F1
-    .data launch_game_new ; F3
-    .data launch_game_hex ; F5
-    .data show_help ; F7 
+keyhandler_table_menu {
+    .data enter_start_game ; fire
+    .data enter_start_game ; space
+    .data show_help ; F1
+    .data $0000 ; F3
+    .data $0000 ; F5
+    .data enter_start_game ; F7 
 }
 
 .section reserved

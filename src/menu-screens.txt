@@ -24,13 +24,12 @@ GAME-GFX BY MR.SPOCK
                     
   MUSIC BY PHANTOM  
 ---
-  SELECT YOUR GAME 
                     
-F1 ........ ORIGINAL
-F3 ... REVEAL ZEROES
-F5 ....... HEX MINES
+         F1
+        Help
 
-F7 ............ HELP
+     Fire or F7
+     START GAME
 ---
   ENJOY THIS SMALL  
   CONTRIBUTION  TO  

@@ -5,6 +5,7 @@ COMMAND_PREPARE_GAME = 4
 COMMAND_GAME_WON = 5
 COMMAND_GAME_LOST = 6
 COMMAND_REVEAL_ZERO = 7
+COMMAND_COPY_START_GAME_SCREEN = 8
 
 .section code
 
@@ -42,6 +43,7 @@ command_table {
     .data game_won
     .data game_lost
     .data reveal_zero
+    .data copy_start_game_screen
 }
 
 .section reserved

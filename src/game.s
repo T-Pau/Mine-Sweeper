@@ -49,23 +49,6 @@ launch_game_done {
     rts
 }
 
-
-launch_game_original {
-    lda #0
-    sta do_reveal_zeros
-    jmp launch_game
-}
-
-launch_game_new {
-    lda #1
-    sta do_reveal_zeros
-    jmp launch_game
-}
-
-launch_game_hex {
-    rts
-}
-
 prepare_game {
     ; TODO: Don't hardcode parameters.
     lda #3
@@ -219,7 +202,6 @@ end_game {
 
 handle_input {
     jsr read_input
-    jsr update_pointer
 
     ; Handle button clicks.
     lda current_command
@@ -378,7 +360,7 @@ handle_left_click {
     bne explode
     tya
     bne :+
-    ldy do_reveal_zeros
+    ldy game_reveal_zeroes
     beq :+
     stx reveal_zero_stack
     ldy #1
@@ -619,7 +601,6 @@ animation_sprite {
 
 .section reserved
 
-do_reveal_zeros .reserve 1
 lives_left .reserve 1
 
 field_position_low .reserve MAX_GAMEFIELD_SIZE

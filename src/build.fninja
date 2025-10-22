@@ -18,6 +18,9 @@ sources :=
     mine-sweeper.s
     music.s
     pointer.s
+    pointer-menu.s
+    start-game.s
+    start-game-screen.s
 
 programs := mine-sweeper.prg
 
@@ -34,9 +37,13 @@ build menu-graphics.s: convert-characters menu-graphics.yaml
 build help-screens.s: convert-screens help-screens.txt
 build end-screens.s: convert-screens end-screens.txt
 build menu-screens.s: convert-screens menu-screens.txt
+build start-game-screen.s: convert-screens start-game-screen.txt
 build pointer.s: convert-sprites pointer.png
     flags = --section graphics_game --align
     name = pointer_sprite
+build pointer-menu.s: convert-sprites pointer.png
+    flags = --section graphics_menu --align
+    name = pointer_sprite_menu
 build explosion.s: convert-sprites explosion.png
     flags = --section graphics_game --align --multicolor --palette ff000000,432b01,6d242b,e9f15e
     name = explosion_sprite

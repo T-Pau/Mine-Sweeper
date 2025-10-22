@@ -17,7 +17,6 @@ tmp .reserve 1
     jsr music_init
     lda #0
     sta current_command
-    sta do_reveal_zeros
     sta last_key
     sta current_key
     jsr setup_menu
@@ -139,7 +138,7 @@ setup_menu {
 show_marquee {
     lda #VIC_VIDEO_ADDRESS(SCREEN_RAM, charset_2x2)
     sta text_charset
-    set_keyhandler_table keyhandler_table_marquee
+    set_keyhandler_table keyhandler_table_menu
     ldx #0
     stx menu_marquee_current_page
     rts
