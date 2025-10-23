@@ -2,6 +2,7 @@ sources :=
     ../Toolkit/xlr8/commodore/irq.s
     ../Toolkit/xlr8/6502/rl-expand.s
     ../Toolkit/xlr8/6502/utility.s
+    attract-screens.s
     commands.s
     end-screens.s
     explosion.s
@@ -11,16 +12,15 @@ sources :=
     help.s
     help-screens.s
     input.s
-    irq-menu.s
     keyboard.s
-    menu-graphics.s
-    menu-screens.s
+    menu.s
+    menu-screen.s
     mine-sweeper.s
     music.s
     pointer.s
-    pointer-menu.s
-    start-game.s
-    start-game-screen.s
+    pointer-title.s
+    title.s
+    title-graphics.s
 
 programs := mine-sweeper.prg
 
@@ -32,18 +32,18 @@ build mine-sweeper.prg | mine-sweeper.prg.sym: link $sources
 
 build mine-sweeper.prg.ll: vice-ll mine-sweeper.prg.sym
 
-build menu-graphics.s: convert-characters menu-graphics.yaml
+build title-graphics.s: convert-characters title-graphics.yaml
 
 build help-screens.s: convert-screens help-screens.txt
 build end-screens.s: convert-screens end-screens.txt
-build menu-screens.s: convert-screens menu-screens.txt
-build start-game-screen.s: convert-screens start-game-screen.txt
+build attract-screens.s: convert-screens attract-screens.txt
+build menu-screen.s: convert-screens menu-screen.txt
 build pointer.s: convert-sprites pointer.png
     flags = --section graphics_game --align
     name = pointer_sprite
-build pointer-menu.s: convert-sprites pointer.png
-    flags = --section graphics_menu --align
-    name = pointer_sprite_menu
+build pointer-title.s: convert-sprites pointer.png
+    flags = --section graphics_title --align
+    name = pointer_sprite_title
 build explosion.s: convert-sprites explosion.png
     flags = --section graphics_game --align --multicolor --palette ff000000,432b01,6d242b,e9f15e
     name = explosion_sprite

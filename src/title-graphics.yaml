@@ -1,4 +1,4 @@
-section: graphics_menu
+section: graphics_title
 
 charset:
   - 
@@ -35,7 +35,7 @@ images:
   -
     file: logo.png
     pixel-size-x: 2
-    name: screen_menu
+    name: screen_title
     section: data
     palette:
       0x000000: 3

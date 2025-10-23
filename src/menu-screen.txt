@@ -24,54 +24,29 @@
 ;  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 ;  IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-COMMAND_START_GAME = 1
-COMMAND_COPY_HELP_SCREEN = 2
-COMMAND_SHOW_ATTRACT = 3
-COMMAND_PREPARE_GAME = 4
-COMMAND_GAME_WON = 5
-COMMAND_GAME_LOST = 6
-COMMAND_REVEAL_ZERO = 7
-COMMAND_COPY_START_GAME_SCREEN = 8
+name menu_screen
+page_mode single
 
-.section code
+map '@'-'_' $00
+map 'a'-'z' $01
+map ' '-'?' $20
+map '{' $1e 
+map '}' $1f
 
-.macro set_command command {
-    lda #command
-    sta current_command
-}
+line_length 40
+lines 14
+---
 
-command_loop {
-    lda current_command
-    beq command_loop
-    asl
-    cmp #.sizeof(command_table) + 2
-    bcs command_loop
-    tay
-    lda command_table - 2,y
-    sta subroutine + 1
-    lda command_table - 1,y
-    beq command_loop
-    sta subroutine + 2
-subroutine:
-    jsr $1000
-    lda #0
-    sta current_command
-    beq command_loop
-}
+            Select Game Mode
 
-.section data
 
-command_table {
-    .data menu
-    .data copy_help_screen
-    .data show_attract
-    .data prepare_game
-    .data game_won
-    .data game_lost
-    .data reveal_zero
-    .data copy_menu_screen
-}
+       (F1) Shape: {square}{hex}
 
-.section reserved
+    (F3) Size: {small}{medium}{big}
 
-current_command .reserve 1
+ (F5) Difficulty: {easy}{normal}{hard}
+
+      (F7) Reveal Zeros: {no}{yes}
+
+
+           (Space) Start Game

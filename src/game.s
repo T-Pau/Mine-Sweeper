@@ -1,3 +1,28 @@
+;  Copyright (C) Dieter Baron
+;
+;  This file is part of Mine Sweeper.
+;  The authors can be contacted at <mine-sweeper@tpau.group>.
+;
+;  Redistribution and use in source and binary forms, with or without
+;  modification, are permitted provided that the following conditions
+;  are met:
+;  1. Redistributions of source code must retain the above copyright
+;     notice, this list of conditions and the following disclaimer.
+;  2. The names of the authors may not be used to endorse or promote
+;     products derived from this software without specific prior
+;     written permission.
+;
+;  THIS SOFTWARE IS PROVIDED BY THE AUTHORS "AS IS" AND ANY EXPRESS
+;  OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+;  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+;  ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY
+;  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+;  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+;  GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+;  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+;  IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+;  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+;  IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 GAME_BITMAP_OFFSET(xx, yy) = game_bitmap + xx * 8 + yy * $140
 FIELD_POSITION_START = GAME_BITMAP_OFFSET(4, 3)
@@ -31,7 +56,7 @@ FIELD_POSITION_START = GAME_BITMAP_OFFSET(4, 3)
 
 launch_game {
     set_bottom_next_action launch_game_faded_out
-    set_bottom_action menu_fade_out
+    set_bottom_action title_fade_out
     set_command COMMAND_PREPARE_GAME
     rts
 }
@@ -64,7 +89,7 @@ prepare_game {
     rts
 }
 
-start_game {
+menu {
     lda #COLOR_BLACK
     sta VIC_BACKGROUND_COLOR
     set_vic_bank $4000
@@ -194,9 +219,9 @@ game_lost {
 
 end_game {
     jsr copy_2x2_screen
-    set_bottom_action menu_fade_in
-    set_bottom_next_action menu_marquee_faded_in
-    jsr setup_menu
+    set_bottom_action title_fade_in
+    set_bottom_next_action attract_faded_in
+    jsr setup_title
     rts
 }
 

@@ -1,3 +1,30 @@
+;  Copyright (C) Dieter Baron
+;
+;  This file is part of Mine Sweeper.
+;  The authors can be contacted at <mine-sweeper@tpau.group>.
+;
+;  Redistribution and use in source and binary forms, with or without
+;  modification, are permitted provided that the following conditions
+;  are met:
+;  1. Redistributions of source code must retain the above copyright
+;     notice, this list of conditions and the following disclaimer.
+;  2. The names of the authors may not be used to endorse or promote
+;     products derived from this software without specific prior
+;     written permission.
+;
+;  THIS SOFTWARE IS PROVIDED BY THE AUTHORS "AS IS" AND ANY EXPRESS
+;  OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+;  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+;  ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY
+;  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+;  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+;  GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+;  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+;  IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+;  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+;  IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
 CLRSCR = $e544
 IRQ_END = $ea31
 
@@ -19,8 +46,8 @@ tmp .reserve 1
     sta current_command
     sta last_key
     sta current_key
-    jsr setup_menu
-    jsr menu_marquee_faded_out
+    jsr setup_title
+    jsr attract_faded_out
     jsr init_irq
     jmp command_loop
 }
@@ -101,7 +128,7 @@ line_count:
     rts
 }
 
-setup_menu {
+setup_title {
     set_vic_bank $0000
     set_vic_text_mode
     lda #0
@@ -127,20 +154,20 @@ setup_menu {
     sta COLOR_RAM + 11 * 40 + 419,x
     dex
     bne :-
-    rl_expand SCREEN_RAM, screen_menu
-    jsr show_marquee
-    set_irq_table irq_menu_table
+    rl_expand SCREEN_RAM, screen_title
+    jsr show_attract
+    set_irq_table irq_table_title
     lda #0
-    sta menu_fade_index
+    sta title_fade_index
     rts
 }
 
-show_marquee {
+show_attract {
     lda #VIC_VIDEO_ADDRESS(SCREEN_RAM, charset_2x2)
     sta text_charset
-    set_keyhandler_table keyhandler_table_menu
+    set_keyhandler_table keyhandler_table_title
     ldx #0
-    stx menu_marquee_current_page
+    stx attract_current_page
     rts
 }
 

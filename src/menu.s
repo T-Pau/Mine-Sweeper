@@ -1,3 +1,29 @@
+;  Copyright (C) Dieter Baron
+;
+;  This file is part of Mine Sweeper.
+;  The authors can be contacted at <mine-sweeper@tpau.group>.
+;
+;  Redistribution and use in source and binary forms, with or without
+;  modification, are permitted provided that the following conditions
+;  are met:
+;  1. Redistributions of source code must retain the above copyright
+;     notice, this list of conditions and the following disclaimer.
+;  2. The names of the authors may not be used to endorse or promote
+;     products derived from this software without specific prior
+;     written permission.
+;
+;  THIS SOFTWARE IS PROVIDED BY THE AUTHORS "AS IS" AND ANY EXPRESS
+;  OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+;  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+;  ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY
+;  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+;  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+;  GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+;  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+;  IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+;  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+;  IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 GAME_SHAPE_SQUARE = 0
 GAME_SHAPE_HEX = 1
 
@@ -11,30 +37,30 @@ GAME_DIFFICULTY_HARD = 2
 
 .section code
 
-enter_start_game {
-    set_bottom_next_action show_start_game
-    set_bottom_action menu_fade_out
+enter_menu {
+    set_bottom_next_action show_menu
+    set_bottom_action title_fade_out
     rts
 }
 
-show_start_game {
+show_menu {
     lda #VIC_VIDEO_ADDRESS(SCREEN_RAM, charset_1x1)
     sta text_charset
     lda #COMMAND_COPY_START_GAME_SCREEN
     sta current_command
-    set_bottom_next_action start_game_fade_in
+    set_bottom_next_action menu_fade_in
     set_bottom_action wait_for_command
     rts
 }
 
-start_game_fade_in {
-    set_bottom_next_action setup_start_game
-    set_bottom_action menu_fade_in
+menu_fade_in {
+    set_bottom_next_action setup_menu
+    set_bottom_action title_fade_in
     rts
 }
 
-setup_start_game {
-    set_keyhandler_table keyhandler_table_start_game
+setup_menu {
+    set_keyhandler_table keyhandler_table_menu
 
     ldx #$03
     stx VIC_SPRITE_ENABLE
@@ -46,7 +72,7 @@ setup_start_game {
     stx pointer_x
     stx pointer_x + 1
     stx pointer_y
-    ldx #pointer_sprite_menu/64
+    ldx #pointer_sprite_title/64
     stx SCREEN_RAM + $03f8
     inx
     stx SCREEN_RAM + $03f9
@@ -57,10 +83,10 @@ setup_start_game {
 
     lda #$ff
     sta highlighted_field
-    set_bottom_action start_game_action
+    set_bottom_action menu_action
     rts
 }
-start_game_action {
+menu_action {
     jsr read_input
     jsr pointer_to_field
     bpl in_field
@@ -87,41 +113,41 @@ no_change:
     lda buttons
     and #BUTTON_LEFT
     beq end
-    jmp start_game_handle_left_click
+    jmp menu_handle_left_click
 end:
     rts
 }
 
-copy_start_game_screen {
-    store_word source_ptr, start_game_screen
+copy_menu_screen {
+    store_word source_ptr, menu_screen
     store_word destination_ptr, TEXT_SCREEN_START
     jsr rl_expand
     ldx game_shape
-    jsr start_game_toggle_field
+    jsr menu_toggle_field
     lda game_size
     clc
     adc #4
     tax
-    jsr start_game_toggle_field
+    jsr menu_toggle_field
     lda game_difficulty
     clc
     adc #8
     tax
-    jsr start_game_toggle_field
+    jsr menu_toggle_field
     lda game_reveal_zeroes
     clc
     adc #12
     tax
-    jsr start_game_toggle_field
+    jsr menu_toggle_field
     rts
 }
 
-start_game_change_difficulty {
+menu_change_difficulty {
     lda game_difficulty
     clc
     adc #8
     tax
-    jsr start_game_toggle_field
+    jsr menu_toggle_field
     ldx game_difficulty
     inx
     cpx #3
@@ -132,15 +158,15 @@ start_game_change_difficulty {
     clc
     adc #8
     tax
-    jmp start_game_toggle_field
+    jmp menu_toggle_field
 }
 
-start_game_change_size {
+menu_change_size {
     lda game_size
     clc
     adc #4
     tax
-    jsr start_game_toggle_field
+    jsr menu_toggle_field
     ldx game_size
     inx
     cpx #3
@@ -151,35 +177,35 @@ start_game_change_size {
     clc
     adc #4
     tax
-    jmp start_game_toggle_field
+    jmp menu_toggle_field
 }
 
-start_game_change_shape {
+menu_change_shape {
     ldx game_shape
-    jsr start_game_toggle_field
+    jsr menu_toggle_field
     lda game_shape
     eor #1
     sta game_shape
     tax
-    jmp start_game_toggle_field
+    jmp menu_toggle_field
 }
 
-start_game_change_reveal_zeroes {
+menu_change_reveal_zeroes {
     lda game_reveal_zeroes
     clc
     adc #12
     tax
-    jsr start_game_toggle_field
+    jsr menu_toggle_field
     lda game_reveal_zeroes
     eor #1
     sta game_reveal_zeroes
     clc
     adc #12
     tax
-    jmp start_game_toggle_field
+    jmp menu_toggle_field
 }
 
-start_game_handle_left_click {
+menu_handle_left_click {
     lda highlighted_field
     cmp #$10
     bne :+
@@ -199,14 +225,14 @@ start_game_handle_left_click {
     beq end
     ora click_field
     tax
-    jsr start_game_toggle_field
+    jsr menu_toggle_field
 index:
     ldx #$00    
     lda click_value
     sta game_config,x
     ora click_field
     tax
-    jsr start_game_toggle_field
+    jsr menu_toggle_field
 end:
     rts
 }
@@ -216,12 +242,12 @@ end:
 ; Arguments:
 ;   X: field index
 ; Preserves: X
-start_game_toggle_field {
-    lda start_game_field_low,x
+menu_toggle_field {
+    lda menu_field_low,x
     sta source_ptr
-    lda start_game_field_high,x
+    lda menu_field_high,x
     sta source_ptr + 1
-    ldy start_game_field_length,x
+    ldy menu_field_length,x
     dey
 :   lda (source_ptr),y
     eor #$80
@@ -237,13 +263,13 @@ start_game_toggle_field {
 ;   X: field index
 ; Preserves: X
 highlight_field {
-    lda start_game_field_low,x
+    lda menu_field_low,x
     sta source_ptr
-    lda start_game_field_high,x
+    lda menu_field_high,x
     eor #>(SCREEN_RAM ^ COLOR_RAM)
     sta source_ptr + 1
     tya
-    ldy start_game_field_length,x
+    ldy menu_field_length,x
     dey
 :   sta (source_ptr),y
     dey
@@ -293,18 +319,18 @@ x_offset:
     ora #>SCREEN_RAM
     sta source_ptr +1
 
-    ldx #.sizeof(start_game_field_length) - 1
+    ldx #.sizeof(menu_field_length) - 1
 field_loop:
     lda source_ptr
     sec
-    sbc start_game_field_low,x
+    sbc menu_field_low,x
     tay
     lda source_ptr + 1
-    sbc start_game_field_high,x
+    sbc menu_field_high,x
     bcc next_field
     bne next_field
     tya
-    cmp start_game_field_length,x
+    cmp menu_field_length,x
     bcs next_field
     cpx #0
     rts
@@ -319,13 +345,13 @@ next_field:
 
 .section data
 
-keyhandler_table_start_game {
+keyhandler_table_menu {
     .data $0000 ; fire
     .data launch_game ; space
-    .data start_game_change_shape ; F1
-    .data start_game_change_size ; F3
-    .data start_game_change_difficulty ; F5
-    .data start_game_change_reveal_zeroes ; F7
+    .data menu_change_shape ; F1
+    .data menu_change_size ; F3
+    .data menu_change_difficulty ; F5
+    .data menu_change_reveal_zeroes ; F7
 }
 
 .macro field line, row, length {
@@ -335,7 +361,7 @@ keyhandler_table_start_game {
 
 FIELD_ADDRESS(line, row) = TEXT_SCREEN_START + (line * 40) + row
 
-start_game_field_low {
+menu_field_low {
     ; Shape
     .data <FIELD_ADDRESS(4, 19)
     .data <FIELD_ADDRESS(4, 27)
@@ -362,7 +388,7 @@ start_game_field_low {
     .data <FIELD_ADDRESS(13, 11)
 }
 
-start_game_field_high {
+menu_field_high {
     ; Shape
     .data >FIELD_ADDRESS(4, 19)
     .data >FIELD_ADDRESS(4, 27)
@@ -389,7 +415,7 @@ start_game_field_high {
     .data >FIELD_ADDRESS(13, 11)
 }
 
-start_game_field_length {
+menu_field_length {
     ; Shape
     .data 8
     .data 5
