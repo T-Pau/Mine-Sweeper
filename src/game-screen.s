@@ -32,24 +32,15 @@ ICON_EMPTY = 11
 ICON_LEFT = 12
 ICON_TOP = 13
 
+FIELD_ICON_ROW_SIZE = .sizeof(field_icons) / 4
+field_icons_mask = field_icons + FIELD_ICON_ROW_SIZE * 2
+
 DIGIT_EMPTY = $0a
 
 digits_right = digits
 digits_left = digits + 11 * 8
 
 SPRITE_POINTER(addr) = (addr & $3fff) / 64
-
-.section data
-
-field_icon_start {
-    ;     0   1   2   3   4   5   6   7   8    fl  sk  em  le  to
-    .data  0,  0,  0,  0,  0,  0,  0,  0,  0,   0,  0,  0,  0, 15
-}
-
-field_icon_end {
-    ;     0   1   2   3   4   5   6   7   8    fl  sk  em  le  to
-    .data 16, 16, 16, 16, 16, 16, 16, 16, 16,  16, 16, 16, 16, 16
-}
 
 .section graphics_game
 

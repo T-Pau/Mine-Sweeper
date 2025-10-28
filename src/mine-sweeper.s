@@ -49,6 +49,8 @@ tmp .reserve 1
     jsr setup_title
     jsr attract_faded_out
     jsr init_irq
+    lda #$36
+    sta $01
     jmp command_loop
 }
 

@@ -563,7 +563,7 @@ clear_field_icons {
     ldx #1
 :   lda #ICON_TOP
     stx restore_top + 1
-;    jsr display_field_icon
+    jsr display_field_icon
 restore_top:
     ldx #0
     inx
@@ -602,27 +602,37 @@ display_field_icon {
     asl a
     sta icon_offset + 1
     lda field_position_low,x
+    sta source_up + 1
     sta destination_up + 1
     clc
     adc #<320
+    sta source_down + 1
     sta destination_down + 1
     lda field_position_high,x
+    sta source_up + 2
     sta destination_up + 2
     adc #>320
+    sta source_down + 2
     sta destination_down + 2
 icon_offset:
     ldx #$00
     ldy #$00
-:   lda field_icons,x
+source_up:
+    lda game_bitmap,y
+    and field_icons_mask,x
+    ora field_icons,x
 destination_up:
     sta game_bitmap,y
-    lda field_icons + .sizeof(field_icons)/2,x
+source_down:
+    lda game_bitmap,y
+    and field_icons_mask + FIELD_ICON_ROW_SIZE,x
+    ora field_icons + FIELD_ICON_ROW_SIZE,x
 destination_down:
     sta game_bitmap,y
     inx
     iny
     cpy #$10
-    bne :-
+    bne source_up
     rts
 }
 

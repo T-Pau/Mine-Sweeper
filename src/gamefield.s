@@ -118,6 +118,9 @@ init_field {
     inx
     stx neighbor_offsets + 7
 
+    lda #$37
+    sta $01
+
     ; Set mines.
     jsr RND
 :   jsr RND1
@@ -134,6 +137,10 @@ init_field {
     bne :-
     lda #0
     sta marked_fields
+
+    lda #$36
+    sta $01
+
     rts
 }
 
