@@ -72,7 +72,7 @@ setup_menu {
     stx pointer_x
     stx pointer_x + 1
     stx pointer_y
-    ldx #pointer_sprite_title/64
+    ldx #title_pointer_sprite/64
     stx SCREEN_RAM + $03f8
     inx
     stx SCREEN_RAM + $03f9

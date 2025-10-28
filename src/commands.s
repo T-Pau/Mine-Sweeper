@@ -62,7 +62,7 @@ subroutine:
 .section data
 
 command_table {
-    .data menu
+    .data start_game
     .data copy_help_screen
     .data show_attract
     .data prepare_game

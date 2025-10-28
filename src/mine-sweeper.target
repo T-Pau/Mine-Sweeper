@@ -34,5 +34,9 @@
 }
 
 .section graphics_game {
-    address: $4000 - $7fff
+    type: reserve_only
+    address [
+        : $8000 - $8fff
+        : $a000 - $bfff
+    ]
 }

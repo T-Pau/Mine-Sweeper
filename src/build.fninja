@@ -8,6 +8,8 @@ sources :=
     explosion.s
     game.s
     gamefield.s
+    game-bitmap.s
+    game-graphics.s
     game-screen.s
     help.s
     help-screens.s
@@ -17,7 +19,6 @@ sources :=
     menu-screen.s
     mine-sweeper.s
     music.s
-    pointer.s
     pointer-title.s
     title.s
     title-graphics.s
@@ -32,18 +33,17 @@ build mine-sweeper.prg | mine-sweeper.prg.sym: link $sources
 
 build mine-sweeper.prg.ll: vice-ll mine-sweeper.prg.sym
 
+build game-graphics.s: convert-characters game-graphics.yaml
 build title-graphics.s: convert-characters title-graphics.yaml
 
 build help-screens.s: convert-screens help-screens.txt
 build end-screens.s: convert-screens end-screens.txt
 build attract-screens.s: convert-screens attract-screens.txt
 build menu-screen.s: convert-screens menu-screen.txt
-build pointer.s: convert-sprites pointer.png
-    flags = --section graphics_game --align
-    name = pointer_sprite
 build pointer-title.s: convert-sprites pointer.png
     flags = --section graphics_title --align
-    name = pointer_sprite_title
+    name = title_pointer_sprite
 build explosion.s: convert-sprites explosion.png
-    flags = --section graphics_game --align --multicolor --palette ff000000,432b01,6d242b,e9f15e
-    name = explosion_sprite
+    flags = --runlength --multicolor --palette ff000000,432b01,6d242b,e9f15e
+    name = explosion_sprite_rl
+build game-bitmap.s: convert-bitmaps game-bitmap.yaml

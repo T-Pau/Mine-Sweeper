@@ -1,0 +1,9 @@
+bitmaps:
+  - file: game-screen.png
+    unused-colors: [0, 3, 14, 6]
+    name: game_small
+    layout: c64-multicolor
+    components:
+      background:
+        constant: true
+        name: GAME_BACKGROUND_COLOR

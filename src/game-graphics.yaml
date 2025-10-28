@@ -1,0 +1,35 @@
+charset:
+  -
+    name: field_icons
+    align: 0x100
+    width: 8
+    height: 8
+    count: 256
+  -
+    name: digits
+    width: 8
+    height: 8
+    count: 256
+
+characters:
+  -
+    file: field-icons.png
+    charset: 0
+    pixel-size-x: 2
+    char-size-x: 2
+    char-size-y: 2
+    placement: ["01", "23"]
+    palette:
+      0x80000000: 0
+      0x000000: 0
+      0x65C5BC: 1
+      0x5C52E6: 2
+      0x221989: 3
+  -
+    file: digits.png
+    charset: 1
+    pixel-size-x: 2
+    palette:
+      0xFFFFFF: 0
+      0x808080: 1
+      0x000000: 2

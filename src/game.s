@@ -25,7 +25,7 @@
 ;  IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 GAME_BITMAP_OFFSET(xx, yy) = game_bitmap + xx * 8 + yy * $140
-FIELD_POSITION_START = GAME_BITMAP_OFFSET(4, 3)
+FIELD_POSITION_START = GAME_BITMAP_OFFSET(2, 1)
 
 ; XLR8: this should be a function, but that doesn't get evaluated 
 .macro sprite_pointer address, offset = 0 {
@@ -75,6 +75,19 @@ launch_game_done {
 }
 
 prepare_game {
+    rl_expand game_bitmap, game_small_bitmap
+    rl_expand game_screen, game_small_screen
+    rl_expand explosion_sprite, explosion_sprite_rl
+    ldx #$80
+:   lda title_pointer_sprite,x
+    sta game_pointer_sprite,x
+    dex
+    bpl :-
+    ldx #SPRITE_POINTER(game_pointer_sprite)
+    stx game_screen + $3f8
+    inx
+    stx game_screen + $3f9
+
     ; TODO: Don't hardcode parameters.
     lda #3
     sta lives_left
@@ -89,26 +102,16 @@ prepare_game {
     rts
 }
 
-menu {
+start_game {
     lda #COLOR_BLACK
     sta VIC_BACKGROUND_COLOR
-    set_vic_bank $4000
+    set_vic_bank $8000
     set_vic_text game_screen, game_bitmap
     set_vic_bitmap_mode
     lda #VIC_SCREEN_WIDTH_40 | VIC_SCREEN_MULTICOLOR
     sta VIC_CONTROL_2
 
-    ldx #250
-:   lda game_color - 1,x
-    sta COLOR_RAM - 1,x
-    lda game_color + 249,x
-    sta COLOR_RAM + 249,x
-    lda game_color + 499,x
-    sta COLOR_RAM + 499,x
-    lda game_color + 749,x
-    sta COLOR_RAM + 749,x
-    dex
-    bne :-
+    rl_expand COLOR_RAM, game_small_color
 
     ldx #$03
     stx VIC_SPRITE_ENABLE
@@ -146,9 +149,13 @@ compute_field_positions {
     sta source_ptr + 1
     sta destination_ptr + 1
     ldy height
-    sty tmp
-    ldy row_span
     iny
+    sty tmp
+    ldx width
+    inx
+    stx row_end + 1 
+
+    ldy #0
 row_loop:
     ldx #0
 column_loop:
@@ -163,7 +170,8 @@ column_loop:
     sta source_ptr + 1
     iny
     inx
-    cpx width
+row_end:
+    cpx #0
     bne column_loop
     lda destination_ptr
     clc
@@ -174,7 +182,6 @@ column_loop:
     adc #>640
     sta source_ptr + 1
     sta destination_ptr + 1
-    iny
     dec tmp
     bne row_loop
     rts
@@ -553,19 +560,33 @@ set_x:
 
 ; Clear displayed playing field.
 clear_field_icons {
-    ldx gamefield_size
-    dex
+    ldx #1
+:   lda #ICON_TOP
+    stx restore_top + 1
+;    jsr display_field_icon
+restore_top:
+    ldx #0
+    inx
+    cpx gamefield_row_offsets
+    bne :-
+
+    lda gamefield_size
+    sec
+    sbc width
+    tax
 loop:
-    lda gamefield,x
-    cmp #FIELD_BORDER
-    beq next
     lda #ICON_EMPTY
-    stx restore + 1
+    ldy gamefield,x
+    cpy #FIELD_BORDER
+    bne :+
+    lda #ICON_LEFT
+:   stx restore + 1
     jsr display_field_icon
 restore:    
     ldx #0
 next:    
     dex
+    cpx width
     bne loop
     rts
 }
