@@ -25,7 +25,7 @@
 ;  IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 GAME_BITMAP_OFFSET(xx, yy) = game_bitmap + xx * 8 + yy * $140
-FIELD_POSITION_START = GAME_BITMAP_OFFSET(2, 1)
+FIELD_POSITION_START = GAME_BITMAP_OFFSET(2, 0)
 
 ; XLR8: this should be a function, but that doesn't get evaluated 
 .macro sprite_pointer address, offset = 0 {
@@ -560,16 +560,6 @@ set_x:
 
 ; Clear displayed playing field.
 clear_field_icons {
-    ldx #1
-:   lda #ICON_TOP
-    stx restore_top + 1
-    jsr display_field_icon
-restore_top:
-    ldx #0
-    inx
-    cpx gamefield_row_offsets
-    bne :-
-
     lda gamefield_size
     sec
     sbc width
@@ -606,11 +596,20 @@ display_field_icon {
     sta destination_up + 1
     clc
     adc #<320
-    sta source_down + 1
-    sta destination_down + 1
+    sta source_mid + 1
+    sta destination_mid + 1
     lda field_position_high,x
     sta source_up + 2
     sta destination_up + 2
+    adc #>320
+    sta source_mid + 2
+    sta destination_mid + 2
+    clc
+    lda source_mid + 1
+    adc #<320
+    sta source_down + 1
+    sta destination_down + 1
+    lda source_mid + 2
     adc #>320
     sta source_down + 2
     sta destination_down + 2
@@ -623,10 +622,16 @@ source_up:
     ora field_icons,x
 destination_up:
     sta game_bitmap,y
-source_down:
+source_mid:
     lda game_bitmap,y
     and field_icons_mask + FIELD_ICON_ROW_SIZE,x
     ora field_icons + FIELD_ICON_ROW_SIZE,x
+destination_mid:
+    sta game_bitmap,y
+source_down:
+    lda game_bitmap,y
+    and field_icons_mask + FIELD_ICON_ROW_SIZE * 2,x
+    ora field_icons + FIELD_ICON_ROW_SIZE * 2,x
 destination_down:
     sta game_bitmap,y
     inx

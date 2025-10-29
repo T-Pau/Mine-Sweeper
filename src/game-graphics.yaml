@@ -4,7 +4,7 @@ charset:
     align: 0x100
     width: 8
     height: 8
-    count: 256
+    count: 512
   -
     name: digits
     width: 8
@@ -17,8 +17,8 @@ characters:
     charset: 0
     pixel-size-x: 2
     char-size-x: 2
-    char-size-y: 2
-    placement: ["01", "23"]
+    char-size-y: 3
+    placement: ["01", "23", "45"]
     palette:
       0xff000000: 0
       0x000000: 0
@@ -28,11 +28,11 @@ characters:
   -
     file: field-icons.png
     charset: 0
-    offset: 128
+    offset: 156
     pixel-size-x: 2
     char-size-x: 2
-    char-size-y: 2
-    placement: ["01", "23"]
+    char-size-y: 3
+    placement: ["01", "23", "45"]
     palette:
       0xff000000: 3
       0x000000: 0

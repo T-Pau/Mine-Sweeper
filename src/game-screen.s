@@ -30,10 +30,9 @@ ICON_FLAG = 9
 ICON_SKULL = 10
 ICON_EMPTY = 11
 ICON_LEFT = 12
-ICON_TOP = 13
 
-FIELD_ICON_ROW_SIZE = .sizeof(field_icons) / 4
-field_icons_mask = field_icons + FIELD_ICON_ROW_SIZE * 2
+FIELD_ICON_ROW_SIZE = .sizeof(field_icons) / 6
+field_icons_mask = field_icons + FIELD_ICON_ROW_SIZE * 3
 
 DIGIT_EMPTY = $0a
 
