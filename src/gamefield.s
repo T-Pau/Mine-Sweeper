@@ -41,82 +41,64 @@ FIELD_BORDER = $ff
 .section code
 
 ; Initialize game field
-; Arguments:
-;   X: width
-;   Y: height
-;   A: number of mines
 init_field {
-    ; Store parameters.
-    sta mines
+    lda mines
     sta marked_mines
-    stx width
-    sty height
+    ldx width
     inx
     stx row_span
 
-    ; Calculate row offsets.
-    inx
-    txa
+    ; Initialize gamefield
     ldy #0
-    clc
-:   sta gamefield_row_offsets,y
-    adc row_span
-    iny 
-    cpy height
-    bne :-
-    adc row_span
-    sta gamefield_size
-
-    ; Clear field.
-    tax
-    lda #0
-:   dex
-    sta gamefield,x
-    bne :-
-
-    ; Set top and bottom borders.
-    ldy gamefield_size
-    dey
-    ldx #0
+    sty tmp
+    ; Top border
     lda #FIELD_BORDER
-:   sta gamefield,x
+:   sta gamefield,y
+    iny
+    cpy row_span
+    bne :-
+
+    ; Side border and rows
+row_loop:
+    lda #FIELD_BORDER
     sta gamefield,y
-    dey
+    iny
+    ldx tmp
+    tya
+    sta gamefield_row_offsets,x
+    lda row_shift,x
+    ldx width
+    cmp #0
+    beq :+
+    dex
+:   stx row_end + 1
+    lda #0
+    tax
+column_loop:
+    sta gamefield,y
+    iny
+    inx
+row_end:
+    cpx #0
+    bne column_loop    
+    ldx tmp
+    inx
+    stx tmp
+    cpx height
+    bne row_loop
+
+    ; Bottom border
+    lda #FIELD_BORDER
+    ldx #0
+:   sta gamefield,y
+    iny
     inx
     cpx row_span
-    bne :-
-    sta gamefield,y
-    dey
-    sta gamefield,y
+    bcc :-
+    beq :-
+    sty gamefield_size
 
-    ; Set side border.
-    ldy #0
-:   ldx gamefield_row_offsets,y
-    sta gamefield - 1,x
-    iny
-    cpy height
-    bne :-
-
-    ; Calculate neighbors.
-    ldx #0
-    stx neighbor_offsets
-    inx
-    stx neighbor_offsets + 1
-    inx
-    stx neighbor_offsets + 2
-    lda row_span
-    tax
-    stx neighbor_offsets + 3
-    inx
-    inx
-    stx neighbor_offsets + 4
-    asl
-    tax
-    stx neighbor_offsets + 5
-    inx
-    stx neighbor_offsets + 6
-    inx
-    stx neighbor_offsets + 7
+    jsr calculate_neighbors
 
     lda #$37
     sta $01
@@ -144,28 +126,83 @@ init_field {
     rts
 }
 
+calculate_neighbors {
+    lda game_shape
+    bne :+
+    jmp calculate_neighbors_square
+:   jmp calculate_neighbors_hex
+}
+
+; Calculate neighbors for square fields.
+calculate_neighbors_square {
+    ldx #0
+    stx neighbor_offsets
+    inx
+    stx neighbor_offsets + 1
+    inx
+    stx neighbor_offsets + 2
+    lda row_span
+    tax
+    stx neighbor_offsets + 3
+    inx
+    inx
+    stx neighbor_offsets + 4
+    asl
+    tax
+    stx neighbor_offsets + 5
+    inx
+    stx neighbor_offsets + 6
+    inx
+    stx neighbor_offsets + 7
+    ldx #8
+    stx neighbor_count
+    rts
+}
+
+; Calculate neighbors for hex fields.
+calculate_neighbors_hex {
+    ldx #1
+    stx neighbor_offsets
+    inx
+    stx neighbor_offsets + 1
+    lda row_span
+    tax
+    stx neighbor_offsets + 2
+    inx
+    inx
+    stx neighbor_offsets + 3
+    asl
+    tax
+    stx neighbor_offsets + 4
+    inx
+    stx neighbor_offsets + 5
+    ldx #6
+    stx neighbor_count
+    rts
+}
 
 ; Adjust count for neighboring fields
 ; Arguments:
 ;   Y: index of field with new mine
 adjust_neighbors {
     tya
-    ; Subtract row_span + 1 to get index of first neighbor.
     clc
     sbc row_span
-    sta source_ptr
-    lda #>gamefield
-    sta source_ptr + 1
+    sta load + 1
+    sta store + 1
 
-    ldx #MAX_NEIGHBORS - 1
+    ldx neighbor_count
+    dex
 loop:
     ldy neighbor_offsets,x
-    lda (source_ptr),y
+load:
+    lda gamefield,y
     cmp #$10
     bcs :+
     clc
     adc #1
-    sta (source_ptr),y
+store:
+    sta gamefield,y
 :   dex
     bpl loop
     rts
@@ -190,6 +227,7 @@ row_span .reserve 1
 gamefield_size .reserve 1
 
 neighbor_offsets .reserve MAX_NEIGHBORS
+neighbor_count .reserve 1
 
 width .reserve 1
 height .reserve 1

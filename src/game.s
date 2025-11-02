@@ -25,7 +25,7 @@
 ;  IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 GAME_BITMAP_OFFSET(xx, yy) = game_bitmap + xx * 8 + yy * $140
-FIELD_POSITION_START = GAME_BITMAP_OFFSET(2, 0)
+FIELD_POSITION_START = GAME_BITMAP_OFFSET(2, 2)
 
 ; XLR8: this should be a function, but that doesn't get evaluated 
 .macro sprite_pointer address, offset = 0 {
@@ -92,8 +92,14 @@ prepare_game {
     lda #3
     sta lives_left
     lda #16
+    sta mines
     ldx #10
+    stx width
     ldy #10
+    sty height
+
+    jsr setup_shape
+
     jsr init_field
     jsr compute_field_positions
     jsr clear_field_icons
@@ -148,16 +154,18 @@ compute_field_positions {
     lda #>FIELD_POSITION_START
     sta source_ptr + 1
     sta destination_ptr + 1
-    ldy height
-    iny
-    sty tmp
-    ldx width
-    inx
-    stx row_end + 1 
 
-    ldy #0
-row_loop:
     ldx #0
+    ldy row_span
+
+row_loop:
+    lda row_shift,x
+    beq column_loop
+    clc
+    adc source_ptr
+    sta source_ptr
+    bcc column_loop
+    inc source_ptr + 1
 column_loop:
     lda source_ptr
     sta field_position_low,y
@@ -169,10 +177,10 @@ column_loop:
     adc #0
     sta source_ptr + 1
     iny
-    inx
-row_end:
-    cpx #0
+    lda gamefield,y
+    cmp #FIELD_BORDER
     bne column_loop
+    ; Next row
     lda destination_ptr
     clc
     adc #<640
@@ -182,7 +190,8 @@ row_end:
     adc #>640
     sta source_ptr + 1
     sta destination_ptr + 1
-    dec tmp
+    inx
+    cpx height
     bne row_loop
     rts
 }
@@ -382,6 +391,29 @@ done:
 ; Arguments:
 ;   X: field index
 handle_left_click {
+.pre_if .false
+    txa
+    clc
+    sbc row_span
+    sta offset + 1
+    ldy #0
+loop:
+    lda neighbor_offsets,y
+    clc
+offset:
+    adc #0
+    tax
+    lda #1
+    sty restore + 1
+    jsr display_field_icon    
+restore:
+    ldy #0
+    iny
+    cpy neighbor_count
+    bne loop
+    rts
+.pre_end
+
     lda gamefield,x
     tay
     cmp #FIELD_MARKED
@@ -451,8 +483,9 @@ end:
 reveal_zero {
     ldy reveal_zero_index
     dey
-    lda reveal_zero_stack,y
+    ldx reveal_zero_stack,y
     sty reveal_zero_index
+    txa
     clc
     sbc row_span
     sta offset + 1
@@ -482,7 +515,7 @@ restore:
     ldy #0
 next_neighbor:
     iny
-    cpy #8
+    cpy neighbor_count
     bne neighbor_loop
     lda reveal_zero_index
     bne reveal_zero
@@ -586,6 +619,13 @@ next:
 ;   A: icon index
 ;   X: field index
 display_field_icon {
+.public field_icon_mask_up = op_field_icon_mask_up + 2
+.public field_icon_mask_mid = op_field_icon_mask_mid + 2
+.public field_icon_mask_down = op_field_icon_mask_down + 2
+.public field_icon_up = op_field_icon_mask_up + 5
+.public field_icon_mid = op_field_icon_mask_mid + 5
+.public field_icon_down = op_field_icon_mask_down + 5
+
     asl a
     asl a
     asl a
@@ -618,26 +658,88 @@ icon_offset:
     ldy #$00
 source_up:
     lda game_bitmap,y
-    and field_icons_mask,x
-    ora field_icons,x
+op_field_icon_mask_up:
+    and field_icons_square_mask,x
+    ora field_icons_square,x
 destination_up:
     sta game_bitmap,y
 source_mid:
     lda game_bitmap,y
-    and field_icons_mask + FIELD_ICON_ROW_SIZE,x
-    ora field_icons + FIELD_ICON_ROW_SIZE,x
+op_field_icon_mask_mid:
+    and field_icons_square_mask + FIELD_ICON_ROW_SIZE,x
+    ora field_icons_square + FIELD_ICON_ROW_SIZE,x
 destination_mid:
     sta game_bitmap,y
 source_down:
     lda game_bitmap,y
-    and field_icons_mask + FIELD_ICON_ROW_SIZE * 2,x
-    ora field_icons + FIELD_ICON_ROW_SIZE * 2,x
+op_field_icon_mask_down:
+    and field_icons_square_mask + FIELD_ICON_ROW_SIZE * 2,x
+    ora field_icons_square + FIELD_ICON_ROW_SIZE * 2,x
 destination_down:
     sta game_bitmap,y
     inx
     iny
     cpy #$10
     bne source_up
+    rts
+}
+
+; Compute row shifts.
+; Arguments:
+;   A: shift for odd rows
+compute_row_shifts {
+    ldx #0
+    sta shift + 1
+:   sta row_shift,x
+shift:
+    eor #$00
+    inx
+    cpx height
+    bne :-
+    rts
+}
+
+; Set up for the selected game shape.
+setup_shape {
+    lda game_shape
+    bne :+
+    jmp setup_square
+:   jmp setup_hex
+}
+
+; Set up for square fields.
+setup_square {
+    lda #0
+    jsr compute_row_shifts
+    ldx #>field_icons_square
+    jsr set_field_icons
+
+    ; TODO
+    rts
+}
+
+; Setup for hex fields.
+setup_hex {
+    lda #8
+    jsr compute_row_shifts
+    ldx #>field_icons_hex
+    jsr set_field_icons
+
+    ; TODO
+    rts
+}
+
+set_field_icons {
+    stx field_icon_up
+    stx field_icon_mid
+    inx
+    stx field_icon_down
+    inx 
+    stx field_icon_mask_up
+    inx
+    stx field_icon_mask_mid
+    inx
+    stx field_icon_mask_down
     rts
 }
 
@@ -666,6 +768,7 @@ lives_left .reserve 1
 
 field_position_low .reserve MAX_GAMEFIELD_SIZE
 field_position_high .reserve MAX_GAMEFIELD_SIZE
+row_shift .reserve MAX_HEIGHT
 
 animation_index .reserve 1
 

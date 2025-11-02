@@ -1,10 +1,16 @@
 charset:
   -
-    name: field_icons
+    name: field_icons_square
     align: 0x100
     width: 8
     height: 8
-    count: 512
+    count: 256
+  -
+    name: field_icons_hex
+    align: 0x100
+    width: 8
+    height: 8
+    count: 256
   -
     name: digits
     width: 8
@@ -13,7 +19,7 @@ charset:
 
 characters:
   -
-    file: field-icons.png
+    file: field-icons-square.png
     charset: 0
     pixel-size-x: 2
     char-size-x: 2
@@ -26,9 +32,36 @@ characters:
       0x5C52E6: 2
       0x221989: 3
   -
-    file: field-icons.png
+    file: field-icons-square.png
     charset: 0
-    offset: 156
+    offset: 78
+    pixel-size-x: 2
+    char-size-x: 2
+    char-size-y: 3
+    placement: ["01", "23", "45"]
+    palette:
+      0xff000000: 3
+      0x000000: 0
+      0x65C5BC: 0
+      0x5C52E6: 0
+      0x221989: 0
+  -
+    file: field-icons-hex.png
+    charset: 1
+    pixel-size-x: 2
+    char-size-x: 2
+    char-size-y: 3
+    placement: ["01", "23", "45"]
+    palette:
+      0xff000000: 0
+      0x000000: 0
+      0x65C5BC: 1
+      0x5C52E6: 2
+      0x221989: 3
+  -
+    file: field-icons-hex.png
+    charset: 1
+    offset: 78
     pixel-size-x: 2
     char-size-x: 2
     char-size-y: 3
@@ -41,7 +74,7 @@ characters:
       0x221989: 0
   -
     file: digits.png
-    charset: 1
+    charset: 2
     pixel-size-x: 2
     palette:
       0xFFFFFF: 0

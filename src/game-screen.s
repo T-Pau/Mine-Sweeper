@@ -31,8 +31,8 @@ ICON_SKULL = 10
 ICON_EMPTY = 11
 ICON_LEFT = 12
 
-FIELD_ICON_ROW_SIZE = .sizeof(field_icons) / 6
-field_icons_mask = field_icons + FIELD_ICON_ROW_SIZE * 3
+FIELD_ICON_ROW_SIZE = .sizeof(field_icons_square) / 6
+field_icons_square_mask = field_icons_square + FIELD_ICON_ROW_SIZE * 3
 
 DIGIT_EMPTY = $0a
 
