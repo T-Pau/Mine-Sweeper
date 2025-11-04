@@ -42,7 +42,7 @@ lines 14
 
        (F1) Shape: {square}{hex}
 
-    (F3) Size: {small}{medium}{big}
+ (F3) Size: {tiny}{small}{medium}{big}
 
  (F5) Difficulty: {easy}{normal}{hard}
 

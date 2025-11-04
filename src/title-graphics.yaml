@@ -38,10 +38,10 @@ images:
     name: screen_title
     section: data
     palette:
-      0x000000: 3
-      0x432B01: 1
-      0x7A3E1F: 2
-      0xA3A3A3: 0
+      c64.black: 3
+      c64.brown: 1
+      c64.orange: 2
+      c64.grey-3: 0
     charset:
       0: 0
       8: 1

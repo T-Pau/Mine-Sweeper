@@ -27,9 +27,10 @@
 GAME_SHAPE_SQUARE = 0
 GAME_SHAPE_HEX = 1
 
-GAME_SIZE_SMALL = 0
-GAME_SIZE_MEDIUM = 1
-GAME_SIZE_LARGE = 2
+GAME_SIZE_TINY = 0
+GAME_SIZE_SMALL = 1
+GAME_SIZE_MEDIUM = 2
+GAME_SIZE_LARGE = 3
 
 GAME_DIFFICULTY_EASY = 0
 GAME_DIFFICULTY_NORMAL = 1
@@ -368,10 +369,10 @@ menu_field_low {
     .data 0, 0
 
     ; Size
-    .data <FIELD_ADDRESS(6, 15)
-    .data <FIELD_ADDRESS(6, 22)
-    .data <FIELD_ADDRESS(6, 30)
-    .data 0
+    .data <FIELD_ADDRESS(6, 12)
+    .data <FIELD_ADDRESS(6, 18)
+    .data <FIELD_ADDRESS(6, 25)
+    .data <FIELD_ADDRESS(6, 33)
 
     ; Difficulty
     .data <FIELD_ADDRESS(8, 18)
@@ -395,10 +396,10 @@ menu_field_high {
     .data 0, 0
 
     ; Size
-    .data >FIELD_ADDRESS(6, 15)
-    .data >FIELD_ADDRESS(6, 22)
-    .data >FIELD_ADDRESS(6, 30)
-    .data 0
+    .data >FIELD_ADDRESS(6, 12)
+    .data >FIELD_ADDRESS(6, 18)
+    .data >FIELD_ADDRESS(6, 25)
+    .data >FIELD_ADDRESS(6, 33)
 
     ; Difficulty
     .data >FIELD_ADDRESS(8, 18)
@@ -423,10 +424,10 @@ menu_field_length {
     .data 0
 
     ; Size
+    .data 6
     .data 7
     .data 8
     .data 5
-    .data 0
 
     ; Difficulty
     .data 6

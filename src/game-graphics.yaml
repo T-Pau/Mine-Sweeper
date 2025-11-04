@@ -26,11 +26,11 @@ characters:
     char-size-y: 3
     placement: ["01", "23", "45"]
     palette:
-      0xff000000: 0
-      0x000000: 0
-      0x65C5BC: 1
-      0x5C52E6: 2
-      0x221989: 3
+      transparent: 0
+      c64.black: 0
+      c64.cyan: 1
+      c64.light-blue: 2
+      c64.blue: 3
   -
     file: field-icons-square.png
     charset: 0
@@ -40,11 +40,11 @@ characters:
     char-size-y: 3
     placement: ["01", "23", "45"]
     palette:
-      0xff000000: 3
-      0x000000: 0
-      0x65C5BC: 0
-      0x5C52E6: 0
-      0x221989: 0
+      transparent: 3
+      c64.black: 0
+      c64.cyan: 0
+      c64.light-blue: 0
+      c64.blue: 0
   -
     file: field-icons-hex.png
     charset: 1
@@ -53,11 +53,11 @@ characters:
     char-size-y: 3
     placement: ["01", "23", "45"]
     palette:
-      0xff000000: 0
-      0x000000: 0
-      0x65C5BC: 1
-      0x5C52E6: 2
-      0x221989: 3
+      transparent: 0
+      c64.black: 0
+      c64.cyan: 1
+      c64.light-blue: 2
+      c64.blue: 3
   -
     file: field-icons-hex.png
     charset: 1
@@ -67,16 +67,16 @@ characters:
     char-size-y: 3
     placement: ["01", "23", "45"]
     palette:
-      0xff000000: 3
-      0x000000: 0
-      0x65C5BC: 0
-      0x5C52E6: 0
-      0x221989: 0
+      transparent: 3
+      c64.black: 0
+      c64.cyan: 0
+      c64.light-blue: 0
+      c64.blue: 0
   -
     file: digits.png
     charset: 2
     pixel-size-x: 2
     palette:
-      0xFFFFFF: 0
-      0x808080: 1
-      0x000000: 2
+      white: 0
+      grey-50: 1
+      black: 2

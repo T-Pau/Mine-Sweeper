@@ -1,9 +1,16 @@
 bitmaps:
-  - file: game-screen.png
+  - file: game-screen-small.png
     unused-colors: [0, 3, 14, 6]
     name: game_small
     layout: c64-multicolor
     components:
       background:
-        constant: true
+        object-type: constant
         name: GAME_BACKGROUND_COLOR
+  - file: game-screen-large.png
+    unused-colors: [0, 3, 14, 6]
+    name: game_large
+    layout: c64-multicolor
+    components:
+      background:
+        object-type: omit

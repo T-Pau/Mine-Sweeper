@@ -713,8 +713,7 @@ setup_square {
     jsr compute_row_shifts
     ldx #>field_icons_square
     jsr set_field_icons
-
-    ; TODO
+    ; TODO: pointer_to_index
     rts
 }
 
@@ -724,8 +723,7 @@ setup_hex {
     jsr compute_row_shifts
     ldx #>field_icons_hex
     jsr set_field_icons
-
-    ; TODO
+    ; TODO: pointer_to_index
     rts
 }
 
