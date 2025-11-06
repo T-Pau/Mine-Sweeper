@@ -25,34 +25,43 @@
 ;  IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 GAME_BITMAP_OFFSET(xx, yy) = game_bitmap + xx * 8 + yy * $140
-FIELD_POSITION_START = GAME_BITMAP_OFFSET(2, 2)
 
 ; XLR8: this should be a function, but that doesn't get evaluated 
 .macro sprite_pointer address, offset = 0 {
     .data (address / 64) & $ff + offset:1
 }
 
-; Display digit in bitmap.
+.macro expand_game_graphics destination, source_table {
+    lda game_config + 1 ; XLR8: game_size
+    and #$02
+    tax
+    lda source_table,x
+    sta source_ptr
+    lda source_table + 1,x
+    sta source_ptr + 1
+    store_word destination_ptr, destination
+    jsr rl_expand
+}
+
+.section code
+
 ; Arguments:
 ;   A: digit
-;   digits: graphics to use
-;   xx: x coordinate to display at
-;   yy: y coordinate to display at
-.macro display_digit digits, xx, yy {
+;   Y: x coordinate * 8
+display_digit {
     asl
     asl
     asl
     tax
-    ldy #0
 :   lda digits,x
-    sta GAME_BITMAP_OFFSET(xx, yy),y
+    sta (destination_ptr),y
     inx
     iny
-    cpy #8
+    tya
+    and #$07
     bne :-
+    rts
 }
-
-.section code
 
 launch_game {
     set_bottom_next_action launch_game_faded_out
@@ -75,8 +84,8 @@ launch_game_done {
 }
 
 prepare_game {
-    rl_expand game_bitmap, game_small_bitmap
-    rl_expand game_screen, game_small_screen
+    expand_game_graphics game_bitmap, game_bitmap_table
+    expand_game_graphics game_screen, game_screen_table
     rl_expand explosion_sprite, explosion_sprite_rl
     ldx #$80
 :   lda title_pointer_sprite,x
@@ -88,15 +97,45 @@ prepare_game {
     inx
     stx game_screen + $3f9
 
-    ; TODO: Don't hardcode parameters.
+    lda game_size
+    and #$02
+    tax
+    lda position_lives_table,x
+    sta position_lives
+    lda position_lives_table + 1,x
+    sta position_lives + 1
+    lda position_time_table,x
+    sta position_time
+    lda position_time_table + 1,x
+    sta position_time + 1
+    lda position_mines_table,x
+    sta position_mines
+    lda position_mines_table + 1,x
+    sta position_mines + 1
+
     lda #3
     sta lives_left
-    lda #16
+    lda game_size
+    asl
+    ora game_shape
+    tay
+    lda game_width,y
+    sta width
+    lda game_height,y
+    sta height
+    lda game_offset_x,y
+    sta offset_x
+    lda game_offset_y,y
+    sta offset_y
+    sty tmp
+    lda game_difficulty
+    asl
+    asl
+    asl
+    ora tmp
+    tay
+    lda game_mines,y
     sta mines
-    ldx #10
-    stx width
-    ldy #10
-    sty height
 
     jsr setup_shape
 
@@ -104,12 +143,12 @@ prepare_game {
     jsr compute_field_positions
     jsr clear_field_icons
     jsr display_lives_left
-    jsr display_marked_fields
+    jsr display_mines
     rts
 }
 
 start_game {
-    lda #COLOR_BLACK
+    lda #GAME_BACKGROUND_COLOR
     sta VIC_BACKGROUND_COLOR
     set_vic_bank $8000
     set_vic_text game_screen, game_bitmap
@@ -117,7 +156,7 @@ start_game {
     lda #VIC_SCREEN_WIDTH_40 | VIC_SCREEN_MULTICOLOR
     sta VIC_CONTROL_2
 
-    rl_expand COLOR_RAM, game_small_color
+    expand_game_graphics COLOR_RAM, game_color_table
 
     ldx #$03
     stx VIC_SPRITE_ENABLE
@@ -148,12 +187,41 @@ start_game {
 }
 
 compute_field_positions {
-    lda #<FIELD_POSITION_START
-    sta source_ptr
-    sta destination_ptr
-    lda #>FIELD_POSITION_START
-    sta source_ptr + 1
+    lda #0
     sta destination_ptr + 1
+    lda offset_y ; *8 <= $18
+    asl ; *16 <= $30
+    asl ; *32 <= $60
+    asl ; *64 <= $c0
+    sta destination_ptr
+    asl ; *128 <= $180
+    rol destination_ptr + 1
+    asl ; *256 <= $300
+    rol destination_ptr + 1
+    adc destination_ptr
+    sta destination_ptr
+    bcc :+
+    inc destination_ptr + 1
+    clc
+:   lda offset_x
+    adc destination_ptr
+    sta destination_ptr
+    bcc :+
+    inc destination_ptr + 1
+
+:   lda destination_ptr + 1
+    ora #>game_bitmap
+    sta destination_ptr + 1
+
+    lda destination_ptr
+    sec
+    sbc #16
+    sta destination_ptr
+    sta source_ptr
+    bcs :+
+    dec destination_ptr + 1
+:   lda destination_ptr + 1
+    sta source_ptr + 1
 
     ldx #0
     ldy row_span
@@ -272,18 +340,24 @@ reset_time {
 }
 
 display_time {
+    copy_word destination_ptr, position_time
     lda CIA1_TOD_SECONDS
     and #$0f
-    display_digit digits_left, 38, 21
+    ldy #$20
+    jsr display_digit
     lda CIA1_TOD_SECONDS
     lsr
     lsr
     lsr
     lsr
-    display_digit digits_left, 37, 21
+    ldy #$18
+    jsr display_digit
     lda CIA1_TOD_MINUTES
     and #$0f
-    display_digit digits_right, 35, 21
+    clc 
+    adc #DIGITS_RIGHT_OFFSET
+    ldy #$08
+    jsr display_digit
     lda CIA1_TOD_MINUTES
     lsr
     lsr
@@ -291,18 +365,30 @@ display_time {
     lsr
     bne :+
     lda #DIGIT_EMPTY
-:   display_digit digits_right, 34, 21
-    rts
+:   clc
+    adc #DIGITS_RIGHT_OFFSET
+    ldy #$00
+    jmp display_digit
 }
 
 display_lives_left {
+    copy_word destination_ptr, position_lives
     lda lives_left
-    display_digit digits_left, 38, 19
-    rts
+    ldy #0
+    jmp display_digit
 }
 
-display_marked_fields {
-    lda marked_fields
+display_mines {
+    copy_word destination_ptr, position_mines
+    ldx #DIGIT_EMPTY
+    lda mines
+    sec
+    sbc marked_fields
+    bcs :+
+    eor #$ff
+    adc #$01
+    inx
+:   stx sign + 1
     ldx #0
 :   cmp #10
     bcc done
@@ -312,13 +398,20 @@ display_marked_fields {
     bne :-
 done:
     stx tens + 1
-    display_digit digits_left, 38, 23
+    ldy #$10
+    jsr display_digit
 tens:
     lda #$00
     bne :+
-    lda #DIGIT_EMPTY
-:   display_digit digits_left, 37, 23  
-    rts      
+    ldx #DIGIT_EMPTY
+    lda sign + 1
+    stx sign + 1
+:   ldy #$08
+    jsr display_digit
+sign:
+    lda #$00
+    ldy #$00
+    jmp display_digit
 }
 
 game_irq {
@@ -439,6 +532,7 @@ explode:
     lda #ICON_SKULL
     jsr display_field_icon
     jsr display_lives_left
+    jsr display_mines
     jsr start_animation
 end:
     rts
@@ -469,7 +563,7 @@ mark:
 :   lda #ICON_FLAG
 update:
     jsr display_field_icon
-    jsr display_marked_fields
+    jsr display_mines
     jsr check_win
     bne end
     lda #KEY_F7
@@ -497,7 +591,8 @@ offset:
     adc #0
     tax
     lda gamefield,x
-    bmi next_neighbor
+    cmp #FIELD_MARKED
+    bcs next_neighbor
     ora #FIELD_REVEALED
     sta gamefield,x
     and #$0f
@@ -530,7 +625,8 @@ next_neighbor:
 pointer_to_index {
     lda pointer_y
     sec
-    sbc #$4a
+    sbc #$31 + 8
+    sbc offset_y
     lsr
     lsr
     lsr
@@ -540,15 +636,24 @@ pointer_to_index {
     tay
 
     ldx pointer_x + 1
-    bne invalid
     lda pointer_x
     sec
-    sbc #$38
+    sbc #$18
+    bcs :+
+    dex
+    sec
+:   sbc offset_x
+    bcs :+
+    dex
+:   lsr
     lsr
     lsr
     lsr
-    lsr
-    cmp width
+    cpx #0
+    beq :+
+    clc
+    adc #16
+:   cmp width
     bcs invalid
     clc
     adc gamefield_row_offsets,y
@@ -760,6 +865,26 @@ animation_sprite {
     }
 }
 
+game_bitmap_table {
+    .data game_small_bitmap, game_large_bitmap
+}
+game_screen_table {
+    .data game_small_screen, game_large_screen
+}
+game_color_table {
+    .data game_small_color, game_large_color
+}
+
+position_lives_table {
+    .data GAME_BITMAP_OFFSET(38, 19), GAME_BITMAP_OFFSET(13, 23)
+}
+position_time_table {
+    .data GAME_BITMAP_OFFSET(34, 21), GAME_BITMAP_OFFSET(19, 23)
+}
+position_mines_table {
+    .data GAME_BITMAP_OFFSET(36, 23), GAME_BITMAP_OFFSET(31, 23)
+}
+
 .section reserved
 
 lives_left .reserve 1
@@ -767,6 +892,13 @@ lives_left .reserve 1
 field_position_low .reserve MAX_GAMEFIELD_SIZE
 field_position_high .reserve MAX_GAMEFIELD_SIZE
 row_shift .reserve MAX_HEIGHT
+
+position_lives .reserve 2
+position_time .reserve 2
+position_mines .reserve 2
+
+offset_x .reserve 1
+offset_y .reserve 1
 
 animation_index .reserve 1
 

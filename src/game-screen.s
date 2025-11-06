@@ -35,9 +35,9 @@ FIELD_ICON_ROW_SIZE = .sizeof(field_icons_square) / 6
 field_icons_square_mask = field_icons_square + FIELD_ICON_ROW_SIZE * 3
 
 DIGIT_EMPTY = $0a
+DIGIT_MINUS = $0b
 
-digits_right = digits
-digits_left = digits + 11 * 8
+DIGITS_RIGHT_OFFSET = .sizeof(digits) / 2 / 8
 
 SPRITE_POINTER(addr) = (addr & $3fff) / 64
 

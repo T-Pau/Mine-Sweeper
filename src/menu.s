@@ -170,7 +170,7 @@ menu_change_size {
     jsr menu_toggle_field
     ldx game_size
     inx
-    cpx #3
+    cpx #4
     bne :+
     ldx #0
 :   stx game_size
@@ -454,6 +454,27 @@ game_config {
     .data GAME_DIFFICULTY_NORMAL
 .public game_reveal_zeroes:
     .data 1
+}
+
+; indexed by size << 1 | shape
+game_width {
+    .data 8, 8,  10, 10,  14, 14,  18, 19
+}
+game_height {
+    .data 8, 8,  10, 10,  10, 10,  10, 10
+}
+game_offset_x { ; in pixels
+    .data 48, 48, 32, 32,  48, 48,  16, 8
+}
+game_offset_y { ; in pixels
+    .data 24, 24, 16, 16,  0, 0,  0, 0
+}
+
+; indexed by difficulty << 3 | size << 1 | shape
+game_mines {
+    .data  7,  6,  11, 10,  15, 14,  21, 20
+    .data 10,  9,  16, 15,  23, 22,  32, 30
+    .data 13, 12,  20, 19,  28, 27,  40, 37
 }
 
 .section reserved
