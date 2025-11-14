@@ -164,10 +164,9 @@ start_game {
     stx VIC_SPRITE_0_COLOR
     dex
     stx VIC_SPRITE_1_COLOR
+
     ldx #0
-    stx pointer_x
-    stx pointer_x + 1
-    stx pointer_y
+    stx pointer_min_y
 
     lda #COLOR_RED
     sta VIC_SPRITE_2_COLOR
@@ -625,7 +624,7 @@ next_neighbor:
 pointer_to_index {
     lda pointer_y
     sec
-    sbc #$31 + 8
+    sbc #8
     sbc offset_y
     lsr
     lsr
@@ -638,11 +637,11 @@ pointer_to_index {
     ldx pointer_x + 1
     lda pointer_x
     sec
-    sbc #$18
+    sbc offset_x
     bcs :+
     dex
     sec
-:   sbc offset_x
+:   sbc row_shift,y
     bcs :+
     dex
 :   lsr
@@ -665,34 +664,23 @@ invalid:
 }
 
 update_pointer {
-    ldx pointer_x
-    ldy pointer_x + 1
-    bne high_x
-    ldy #$00
-    cpx #$17
-    bcs set_x
-    ldx #$17
-    bne set_x
-high_x:
-    ldy #$03
-    cpx #$57
-    bcc set_x
-    ldx #$56
-set_x:
-    stx pointer_x
-    stx VIC_SPRITE_0_X
-    stx VIC_SPRITE_1_X
-    sty VIC_SPRITE_X_MSB
-    ldx pointer_y
-    cpx #$31
-    bcs :+
-    ldx #$31
-:   cpx #$f9
+    lda pointer_x
+    ldx pointer_x + 1
+    clc
+    adc #$17
     bcc :+
-    ldx #$f8
-:   stx pointer_y
-    stx VIC_SPRITE_0_Y
-    stx VIC_SPRITE_1_Y
+    inx
+:   cpx #0
+    beq :+
+    ldx #3
+:   sta VIC_SPRITE_0_X
+    sta VIC_SPRITE_1_X
+    stx VIC_SPRITE_X_MSB
+    lda pointer_y
+    clc
+    adc #$31
+    sta VIC_SPRITE_0_Y
+    sta VIC_SPRITE_1_Y
     rts
 }
 

@@ -63,16 +63,15 @@ menu_fade_in {
 setup_menu {
     set_keyhandler_table keyhandler_table_menu
 
+    ldx #88
+    stx pointer_min_y
+
     ldx #$03
     stx VIC_SPRITE_ENABLE
     ldx #COLOR_WHITE
     stx VIC_SPRITE_0_COLOR
     dex
     stx VIC_SPRITE_1_COLOR
-    ldx #0
-    stx pointer_x
-    stx pointer_x + 1
-    stx pointer_y
     ldx #title_pointer_sprite/64
     stx SCREEN_RAM + $03f8
     inx
@@ -282,11 +281,7 @@ highlight_field {
 pointer_to_field {
     lda pointer_x
     ldy pointer_x + 1
-    sec
-    sbc #$17
-    bcs :+
-    dey
-:   lsr
+    lsr
     lsr
     lsr
     cpy #0
@@ -296,8 +291,6 @@ pointer_to_field {
 :   sta x_offset + 1
 
     lda pointer_y
-    sec
-    sbc #$31
     and #$f8
     sta source_ptr
     ldy #0

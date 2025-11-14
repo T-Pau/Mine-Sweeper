@@ -29,6 +29,23 @@
 .public BUTTON_LEFT = $01
 .public BUTTON_RIGHT = $02
 
+; Initialize input handling.
+.public init_input {
+    lda #$00
+    sta last_potx
+    sta last_poty
+    sta previous_buttons
+    sta pointer_x
+    sta pointer_x + 1
+    sta pointer_y
+    sta pointer_min_x
+    sta pointer_min_x + 1
+    store_word pointer_max_x, 320
+    lda #200
+    sta pointer_max_y
+    rts
+}
+
 ; Reads mouse and joystick.
 ; Result:
 ;   pointer_x: new x position
@@ -37,6 +54,7 @@
 .public read_input {
     jsr read_mouse
     jsr read_joystick
+    jsr constrain_pointer
     jsr update_pointer
     lda previous_buttons
     ldx buttons
@@ -45,6 +63,50 @@
     and buttons
     sta buttons
     rts
+}
+
+; Constrain pointer to min/max values.
+constrain_pointer {
+    ldx pointer_x + 1
+    lda pointer_x
+    cpx pointer_min_x + 1
+    bcc x_too_small
+    lda pointer_x
+    cmp pointer_min_x
+    bcs check_x_max
+x_too_small:
+    lda pointer_min_x
+    sta pointer_x
+    lda pointer_min_x + 1
+    sta pointer_x + 1
+    jmp check_y
+check_x_max:
+    cpx pointer_max_x + 1
+    bcc check_y
+    cmp pointer_max_x
+    bcc check_y
+    ; x too big
+    ldy pointer_max_x + 1
+    ldx pointer_max_x
+    bne :+
+    dey
+:   dex
+    stx pointer_x
+    sty pointer_x + 1
+
+check_y:
+    lda pointer_y
+    cmp pointer_min_y
+    bcs :+
+    lda pointer_min_y
+    sta pointer_y
+    rts
+:   cmp pointer_max_y
+    bcc :+
+    ldx pointer_max_y
+    dex
+    stx pointer_y 
+:   rts
 }
 
 read_mouse {
@@ -103,6 +165,8 @@ move_up:
     sec
     eor #$ff
     adc pointer_y
+    bcs end_y
+    lda #$00
 end_y:
     sta pointer_y
     stx last_poty
@@ -194,6 +258,11 @@ right_done:
 .public pointer_x .reserve 2
 .public pointer_y .reserve 1
 .public buttons .reserve 1
+
+.public pointer_min_x .reserve 2
+.public pointer_max_x .reserve 2
+.public pointer_min_y .reserve 1
+.public pointer_max_y .reserve 1
 
 last_potx .reserve 1
 last_poty .reserve 1

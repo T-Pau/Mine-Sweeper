@@ -41,6 +41,7 @@ tmp .reserve 1
     lda #COLOR_BLACK
     sta VIC_BORDER_COLOR
     sta VIC_BACKGROUND_COLOR
+    jsr init_input
     jsr music_init
     lda #0
     sta current_command
