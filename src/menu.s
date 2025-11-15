@@ -41,13 +41,16 @@ GAME_DIFFICULTY_HARD = 2
 enter_menu {
     set_bottom_next_action show_menu
     set_bottom_action title_fade_out
+    set_keyhandler_table keyhandler_table_menu
+    lda #0
+    sta menu_update_screen
     rts
 }
 
 show_menu {
     lda #VIC_VIDEO_ADDRESS(SCREEN_RAM, charset_1x1)
     sta text_charset
-    lda #COMMAND_COPY_START_GAME_SCREEN
+    lda #COMMAND_COPY_MENU_SCREEN
     sta current_command
     set_bottom_next_action menu_fade_in
     set_bottom_action wait_for_command
@@ -57,12 +60,29 @@ show_menu {
 menu_fade_in {
     set_bottom_next_action setup_menu
     set_bottom_action title_fade_in
+    lda #1
+    sta menu_update_screen
+    ldx game_shape
+    jsr menu_toggle_field
+    lda game_size
+    clc
+    adc #4
+    tax
+    jsr menu_toggle_field
+    lda game_difficulty
+    clc
+    adc #8
+    tax
+    jsr menu_toggle_field
+    lda game_reveal_zeroes
+    clc
+    adc #12
+    tax
+    jsr menu_toggle_field
     rts
 }
 
 setup_menu {
-    set_keyhandler_table keyhandler_table_menu
-
     ldx #88
     stx pointer_min_y
 
@@ -121,25 +141,7 @@ end:
 copy_menu_screen {
     store_word source_ptr, menu_screen
     store_word destination_ptr, TEXT_SCREEN_START
-    jsr rl_expand
-    ldx game_shape
-    jsr menu_toggle_field
-    lda game_size
-    clc
-    adc #4
-    tax
-    jsr menu_toggle_field
-    lda game_difficulty
-    clc
-    adc #8
-    tax
-    jsr menu_toggle_field
-    lda game_reveal_zeroes
-    clc
-    adc #12
-    tax
-    jsr menu_toggle_field
-    rts
+    jmp rl_expand
 }
 
 menu_change_difficulty {
@@ -238,11 +240,13 @@ end:
 }
 
 
-; Toggle field in start game screen.
+; Toggle field in start game screen. Skip update if menu_update_screen is zero.
 ; Arguments:
 ;   X: field index
 ; Preserves: X
 menu_toggle_field {
+    lda menu_update_screen
+    beq end
     lda menu_field_low,x
     sta source_ptr
     lda menu_field_high,x
@@ -254,6 +258,7 @@ menu_toggle_field {
     sta (source_ptr),y
     dey
     bpl :-
+end:
     rts
 }    
 
@@ -473,6 +478,7 @@ game_mines {
 .section reserved
 
 highlighted_field .reserve 1
+menu_update_screen .reserve 1
 
 click_field .reserve 1
 click_value .reserve 1
