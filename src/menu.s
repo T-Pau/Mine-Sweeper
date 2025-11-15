@@ -41,9 +41,6 @@ GAME_DIFFICULTY_HARD = 2
 enter_menu {
     set_bottom_next_action show_menu
     set_bottom_action title_fade_out
-    set_keyhandler_table keyhandler_table_menu
-    lda #0
-    sta menu_update_screen
     rts
 }
 
@@ -54,6 +51,9 @@ show_menu {
     sta current_command
     set_bottom_next_action menu_fade_in
     set_bottom_action wait_for_command
+    set_keyhandler_table keyhandler_table_menu
+    lda #0
+    sta menu_update_screen
     rts
 }
 

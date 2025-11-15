@@ -424,23 +424,52 @@ game_irq {
 start_animation {
     lda #0
     sta animation_index
+
+    ; Calculate sprite X position.
+    ldy pointer_row
+    ldx #0
+    lda pointer_column
+    asl
+    asl
+    asl
+    asl
+    bcc :+
+    inx
+    clc
+:   adc row_shift,y
+    bcc :+
+    inx
+    clc
+:   adc offset_x
+    bcc :+
+    inx
+    clc
+:   adc #$18 
+    bcc :+
+    inx
+:   sta VIC_SPRITE_2_X
+    lda VIC_SPRITE_X_MSB
+    cpx #0
+    beq :+
+    ora #$04
+    bne high_x
+:   and #$fb
+high_x:
+    sta VIC_SPRITE_X_MSB
+
+    ; Calculate sprite Y position.
+    tya
+    asl
+    asl
+    asl
+    asl
+    adc offset_y
+    adc #$31 + 8 ; offset_y is one row above actual field due to top border of field
+    sta VIC_SPRITE_2_Y
+
     lda #7
     sta VIC_SPRITE_ENABLE
-    lda pointer_x
-    sec
-    sbc #$18
-    and #$f0
-    clc
-    adc #$18
-    sta VIC_SPRITE_2_X
-    lda pointer_y
-    sec
-    sbc #$3a
-    and #$f0
-    clc
-    adc #$3a
-    sta VIC_SPRITE_2_Y
-    jmp handle_animation
+    rts
 }
 
 handle_animation {
@@ -621,6 +650,8 @@ next_neighbor:
 ; Returns:
 ;   X: index
 ;   Z: set if pointer outside gamefield.
+;   pointer_column: column of field pointed to
+;   pointer_row: row of field pointed to
 pointer_to_index {
     lda pointer_y
     sec
@@ -633,6 +664,7 @@ pointer_to_index {
     cmp height
     bcs invalid
     tay
+    sty pointer_row
 
     ldx pointer_x + 1
     lda pointer_x
@@ -654,6 +686,7 @@ pointer_to_index {
     adc #16
 :   cmp width
     bcs invalid
+    sta pointer_column
     clc
     adc gamefield_row_offsets,y
     tax
@@ -670,12 +703,16 @@ update_pointer {
     adc #$17
     bcc :+
     inx
-:   cpx #0
-    beq :+
-    ldx #3
 :   sta VIC_SPRITE_0_X
     sta VIC_SPRITE_1_X
-    stx VIC_SPRITE_X_MSB
+    lda VIC_SPRITE_X_MSB
+    cpx #0
+    beq :+
+    ora #$03
+    bne high_x
+:   and #$fc
+high_x:
+    sta VIC_SPRITE_X_MSB
     lda pointer_y
     clc
     adc #$31
@@ -890,6 +927,8 @@ offset_y .reserve 1
 
 animation_index .reserve 1
 
+pointer_column .reserve 1
+pointer_row .reserve 1
 
 reveal_zero_stack .reserve MAX_WIDTH * MAX_HEIGHT
 reveal_zero_index .reserve 1 ; Points to first free element in reveal_zero_stack.
