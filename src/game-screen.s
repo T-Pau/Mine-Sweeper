@@ -24,6 +24,9 @@
 ;  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 ;  IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+game_map_original_bitmap = game_map_small_bitmap
+game_map_original_screen = game_map_small_screen
+game_map_original_color = game_map_small_color
 
 
 ICON_FLAG = 9

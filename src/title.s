@@ -200,7 +200,7 @@ keyhandler_table_title {
     .data enter_menu ; space
     .data show_help ; F1
     .data $0000 ; F3
-    .data $0000 ; F5
+    .data launch_original_game ; F5
     .data enter_menu ; F7 
 }
 

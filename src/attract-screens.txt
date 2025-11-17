@@ -37,9 +37,9 @@ runlength_encode no
 
          A          
                     
-       T'PAU        
+  T'Pau Production
                     
- Production in 1992 
+    1992 / 2026
 
 ---
    Code by Dillo    
@@ -50,12 +50,12 @@ Game-GFX by Mr.Spock
                     
   Music by Phantom  
 ---
-                    
-         F1
-        Help
+      F1  Help
+
+ F5  Original Game
 
      Fire or F7
-     START GAME
+    Modern Game
 ---
   Enjoy this small  
   contribution  to  

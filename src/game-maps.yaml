@@ -1,0 +1,64 @@
+settings:
+  include_count: false
+  prefix: game_map_
+
+fields:
+  name:
+    type: omit
+  bitmap:
+    default_value: "game_map_{{name}}_bitmap"
+  screen:
+    default_value: "game_map_{{name}}_screen"
+  color:
+    default_value: "game_map_{{name}}_color"
+  position_x:
+    type: omit
+  position_y:
+    type: omit
+  lives_position_x:
+    type: omit
+    default_value: "{{position_x}}"
+  lives_position_y:
+    type: omit
+    default_value: "{{position_y}}"
+  lives_position:
+    default_value: "GAME_BITMAP_OFFSET({{lives_position_x}}, {{lives_position_y}})"
+  time_position_x:
+    type: omit
+    default_value: "{{position_x}}"
+  time_position_y:
+    type: omit
+    default_value: "{{position_y}}"
+  time_position:
+    default_value: "GAME_BITMAP_OFFSET({{time_position_x}}, {{time_position_y}})"
+  mines_position_x:
+    type: omit
+    default_value: "{{position_x}}"
+  mines_position_y:
+    type: omit
+    default_value: "{{position_y}}"
+  mines_position:
+    default_value: "GAME_BITMAP_OFFSET({{mines_position_x}}, {{mines_position_y}})"
+structs:
+  - 
+    name: original
+    lives_position_x: 38
+    lives_position_y: 19
+    time_position_x: 34
+    time_position_y: 21
+    mines_position_x: 36
+    mines_position_y: 23
+  -
+    name: small
+    lives_position_x: 38
+    lives_position_y: 19
+    time_position_x: 34
+    time_position_y: 21
+    mines_position_x: 36
+    mines_position_y: 23
+  -
+    name: large
+    position_y: 23
+    lives_position_x: 13
+    time_position_x: 19
+    mines_position_x: 31

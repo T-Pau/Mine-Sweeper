@@ -10,6 +10,7 @@ sources :=
     gamefield.s
     game-bitmap.s
     game-graphics.s
+    game-maps.s
     game-screen.s
     help.s
     help-screens.s
@@ -35,6 +36,8 @@ build mine-sweeper.prg.ll: vice-ll mine-sweeper.prg.sym
 
 build game-graphics.s: convert-characters game-graphics.yaml
 build title-graphics.s: convert-characters title-graphics.yaml
+
+build game-maps.s: parallel-struct game-maps.yaml
 
 build help-screens.s: convert-screens help-screens.txt
 build end-screens.s: convert-screens end-screens.txt

@@ -74,11 +74,6 @@ menu_fade_in {
     adc #8
     tax
     jsr menu_toggle_field
-    lda game_reveal_zeroes
-    clc
-    adc #12
-    tax
-    jsr menu_toggle_field
     rts
 }
 
@@ -192,24 +187,9 @@ menu_change_shape {
     jmp menu_toggle_field
 }
 
-menu_change_reveal_zeroes {
-    lda game_reveal_zeroes
-    clc
-    adc #12
-    tax
-    jsr menu_toggle_field
-    lda game_reveal_zeroes
-    eor #1
-    sta game_reveal_zeroes
-    clc
-    adc #12
-    tax
-    jmp menu_toggle_field
-}
-
 menu_handle_left_click {
     lda highlighted_field
-    cmp #$10
+    cmp #$0c
     bne :+
     jmp launch_game
 :   and #$fc
@@ -350,7 +330,7 @@ keyhandler_table_menu {
     .data menu_change_shape ; F1
     .data menu_change_size ; F3
     .data menu_change_difficulty ; F5
-    .data menu_change_reveal_zeroes ; F7
+    .data launch_game ; F7
 }
 
 .macro field line, row, length {
@@ -362,56 +342,46 @@ FIELD_ADDRESS(line, row) = TEXT_SCREEN_START + (line * 40) + row
 
 menu_field_low {
     ; Shape
-    .data <FIELD_ADDRESS(4, 19)
-    .data <FIELD_ADDRESS(4, 27)
+    .data <FIELD_ADDRESS(5, 19)
+    .data <FIELD_ADDRESS(5, 27)
     .data 0, 0
 
     ; Size
-    .data <FIELD_ADDRESS(6, 12)
-    .data <FIELD_ADDRESS(6, 18)
-    .data <FIELD_ADDRESS(6, 25)
-    .data <FIELD_ADDRESS(6, 33)
+    .data <FIELD_ADDRESS(7, 12)
+    .data <FIELD_ADDRESS(7, 18)
+    .data <FIELD_ADDRESS(7, 25)
+    .data <FIELD_ADDRESS(7, 33)
 
     ; Difficulty
-    .data <FIELD_ADDRESS(8, 18)
-    .data <FIELD_ADDRESS(8, 24)
-    .data <FIELD_ADDRESS(8, 32)
+    .data <FIELD_ADDRESS(9, 18)
+    .data <FIELD_ADDRESS(9, 24)
+    .data <FIELD_ADDRESS(9, 32)
     .data 0
 
-    ; Reveal Zeroes
-    .data <FIELD_ADDRESS(10, 25)
-    .data <FIELD_ADDRESS(10, 29)
-    .data 0, 0
-
     ; Start Game
-    .data <FIELD_ADDRESS(13, 11)
+    .data <FIELD_ADDRESS(12, 11)
 }
 
 menu_field_high {
     ; Shape
-    .data >FIELD_ADDRESS(4, 19)
-    .data >FIELD_ADDRESS(4, 27)
+    .data >FIELD_ADDRESS(5, 19)
+    .data >FIELD_ADDRESS(5, 27)
     .data 0, 0
 
     ; Size
-    .data >FIELD_ADDRESS(6, 12)
-    .data >FIELD_ADDRESS(6, 18)
-    .data >FIELD_ADDRESS(6, 25)
-    .data >FIELD_ADDRESS(6, 33)
+    .data >FIELD_ADDRESS(7, 12)
+    .data >FIELD_ADDRESS(7, 18)
+    .data >FIELD_ADDRESS(7, 25)
+    .data >FIELD_ADDRESS(7, 33)
 
     ; Difficulty
-    .data >FIELD_ADDRESS(8, 18)
-    .data >FIELD_ADDRESS(8, 24)
-    .data >FIELD_ADDRESS(8, 32)
+    .data >FIELD_ADDRESS(9, 18)
+    .data >FIELD_ADDRESS(9, 24)
+    .data >FIELD_ADDRESS(9, 32)
     .data 0
 
-    ; Reveal Zeroes
-    .data >FIELD_ADDRESS(10, 25)
-    .data >FIELD_ADDRESS(10, 29)
-    .data 0, 0
-
     ; Start Game
-    .data >FIELD_ADDRESS(13, 11)
+    .data >FIELD_ADDRESS(12, 11)
 }
 
 menu_field_length {
@@ -433,12 +403,6 @@ menu_field_length {
     .data 6
     .data 0
 
-    ; Reveal Zeros
-    .data 4
-    .data 5
-    .data 0
-    .data 0
-
     ; Start Game
     .data 18
 }
@@ -450,9 +414,10 @@ game_config {
     .data GAME_SIZE_SMALL
 .public game_difficulty:
     .data GAME_DIFFICULTY_NORMAL
-.public game_reveal_zeroes:
-    .data 1
 }
+
+GAME_ORIGINAL_OFFSET_X = 32
+GAME_ORIGINAL_OFFSET_Y = 16
 
 ; indexed by size << 1 | shape
 game_width {

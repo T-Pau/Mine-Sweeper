@@ -26,21 +26,13 @@
 
 GAME_BITMAP_OFFSET(xx, yy) = game_bitmap + xx * 8 + yy * $140
 
+GAME_MAP_ORIGINAL = 0
+GAME_MAP_SMALL = 2
+GAME_MAP_LARGE = 4
+
 ; XLR8: this should be a function, but that doesn't get evaluated 
 .macro sprite_pointer address, offset = 0 {
     .data (address / 64) & $ff + offset:1
-}
-
-.macro expand_game_graphics destination, source_table {
-    lda game_config + 1 ; XLR8: game_size
-    and #$02
-    tax
-    lda source_table,x
-    sta source_ptr
-    lda source_table + 1,x
-    sta source_ptr + 1
-    store_word destination_ptr, destination
-    jsr rl_expand
 }
 
 .section code
@@ -63,56 +55,42 @@ display_digit {
     rts
 }
 
+launch_original_game {
+    set_bottom_next_action launch_game_faded_out
+    set_bottom_action title_fade_out
+    set_command COMMAND_PREPARE_GAME
+    
+    lda #GAME_MAP_ORIGINAL
+    sta game_map
+    lda #10
+    sta width
+    lda #10
+    sta height
+    lda #0
+    sta reveal_zeroes
+    lda #3
+    sta lives_left
+    lda #GAME_ORIGINAL_OFFSET_X
+    sta offset_x
+    lda #GAME_ORIGINAL_OFFSET_Y
+    sta offset_y
+    lda #16
+    sta mines
+
+    jmp setup_square
+}
+
 launch_game {
     set_bottom_next_action launch_game_faded_out
     set_bottom_action title_fade_out
     set_command COMMAND_PREPARE_GAME
-    rts
-}
 
-launch_game_faded_out {
-    set_bottom_next_action launch_game_done
-    set_bottom_action wait_for_command
-    rts
-}
+    ldx game_size
+    lda game_map,x
+    sta game_map
 
-launch_game_done {
-    lda #COMMAND_START_GAME
-    sta current_command
-    set_irq_table music_irq_table
-    rts
-}
-
-prepare_game {
-    expand_game_graphics game_bitmap, game_bitmap_table
-    expand_game_graphics game_screen, game_screen_table
-    rl_expand explosion_sprite, explosion_sprite_rl
-    ldx #$80
-:   lda title_pointer_sprite,x
-    sta game_pointer_sprite,x
-    dex
-    bpl :-
-    ldx #SPRITE_POINTER(game_pointer_sprite)
-    stx game_screen + $3f8
-    inx
-    stx game_screen + $3f9
-
-    lda game_size
-    and #$02
-    tax
-    lda position_lives_table,x
-    sta position_lives
-    lda position_lives_table + 1,x
-    sta position_lives + 1
-    lda position_time_table,x
-    sta position_time
-    lda position_time_table + 1,x
-    sta position_time + 1
-    lda position_mines_table,x
-    sta position_mines
-    lda position_mines_table + 1,x
-    sta position_mines + 1
-
+    lda #1
+    sta reveal_zeroes
     lda #3
     sta lives_left
     lda game_size
@@ -137,7 +115,71 @@ prepare_game {
     lda game_mines,y
     sta mines
 
-    jsr setup_shape
+    jmp setup_shape
+}
+
+; Set up game map to use.
+; Arguments:
+;   A: game map index
+set_game_map {
+    ldx game_map
+    lda game_map_lives_position,x
+    sta position_lives
+    lda game_map_lives_position + 1,x
+    sta position_lives + 1
+    lda game_map_time_position,x
+    sta position_time
+    lda game_map_time_position + 1,x
+    sta position_time + 1
+    lda game_map_mines_position,x
+    sta position_mines
+    lda game_map_mines_position + 1,x
+    sta position_mines + 1
+
+    lda game_map_bitmap,x
+    sta source_ptr
+    lda game_map_bitmap + 1,x
+    sta source_ptr + 1
+    store_word destination_ptr, game_bitmap
+    jsr rl_expand
+
+    ldx game_map
+    lda game_map_screen,x
+    sta source_ptr
+    lda game_map_screen + 1,x
+    sta source_ptr + 1
+    store_word destination_ptr, game_screen
+    jsr rl_expand
+
+    rl_expand explosion_sprite, explosion_sprite_rl
+
+    rts
+}
+
+launch_game_faded_out {
+    set_bottom_next_action launch_game_done
+    set_bottom_action wait_for_command
+    rts
+}
+
+launch_game_done {
+    lda #COMMAND_START_GAME
+    sta current_command
+    set_irq_table music_irq_table
+    rts
+}
+
+prepare_game {
+    jsr set_game_map
+    ldx #$80
+:   lda title_pointer_sprite,x
+    sta game_pointer_sprite,x
+    dex
+    bpl :-
+    ldx #SPRITE_POINTER(game_pointer_sprite)
+    stx game_screen + $3f8
+    inx
+    stx game_screen + $3f9
 
     jsr init_field
     jsr compute_field_positions
@@ -156,7 +198,13 @@ start_game {
     lda #VIC_SCREEN_WIDTH_40 | VIC_SCREEN_MULTICOLOR
     sta VIC_CONTROL_2
 
-    expand_game_graphics COLOR_RAM, game_color_table
+    ldx game_map
+    lda game_map_color,x
+    sta source_ptr
+    lda game_map_color + 1,x
+    sta source_ptr + 1
+    store_word destination_ptr, COLOR_RAM
+    jsr rl_expand
 
     ldx #$03
     stx VIC_SPRITE_ENABLE
@@ -545,7 +593,7 @@ restore:
     bne explode
     tya
     bne :+
-    ldy game_reveal_zeroes
+    ldy reveal_zeroes
     beq :+
     stx reveal_zero_stack
     ldy #1
@@ -890,26 +938,6 @@ animation_sprite {
     }
 }
 
-game_bitmap_table {
-    .data game_small_bitmap, game_large_bitmap
-}
-game_screen_table {
-    .data game_small_screen, game_large_screen
-}
-game_color_table {
-    .data game_small_color, game_large_color
-}
-
-position_lives_table {
-    .data GAME_BITMAP_OFFSET(38, 19), GAME_BITMAP_OFFSET(13, 23)
-}
-position_time_table {
-    .data GAME_BITMAP_OFFSET(34, 21), GAME_BITMAP_OFFSET(19, 23)
-}
-position_mines_table {
-    .data GAME_BITMAP_OFFSET(36, 23), GAME_BITMAP_OFFSET(31, 23)
-}
-
 .section reserved
 
 lives_left .reserve 1
@@ -933,3 +961,6 @@ pointer_row .reserve 1
 reveal_zero_stack .reserve MAX_WIDTH * MAX_HEIGHT
 reveal_zero_index .reserve 1 ; Points to first free element in reveal_zero_stack.
 
+reveal_zeroes .reserve 1
+
+game_map .reserve 1

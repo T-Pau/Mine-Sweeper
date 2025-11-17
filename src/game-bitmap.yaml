@@ -1,7 +1,7 @@
 bitmaps:
   - file: game-screen-small.png
     unused-colors: [0, 3, 14, 6]
-    name: game_small
+    name: game_map_small
     layout: c64-multicolor
     components:
       background:
@@ -9,7 +9,7 @@ bitmaps:
         name: GAME_BACKGROUND_COLOR
   - file: game-screen-large.png
     unused-colors: [0, 3, 14, 6]
-    name: game_large
+    name: game_map_large
     layout: c64-multicolor
     components:
       background:

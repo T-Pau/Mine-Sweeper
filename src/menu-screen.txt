@@ -37,6 +37,7 @@ line_length 40
 lines 14
 ---
 
+
             Select Game Mode
 
 
@@ -45,8 +46,6 @@ lines 14
  (F3) Size: {tiny}{small}{medium}{big}
 
  (F5) Difficulty: {easy}{normal}{hard}
-
-      (F7) Reveal Zeros: {no}{yes}
 
 
            (Space) Start Game
