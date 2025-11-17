@@ -67,7 +67,7 @@ launch_original_game {
     lda #10
     sta height
     lda #0
-    sta reveal_zeroes
+    sta modern_mode
     lda #3
     sta lives_left
     lda #GAME_ORIGINAL_OFFSET_X
@@ -90,7 +90,7 @@ launch_game {
     sta game_map
 
     lda #1
-    sta reveal_zeroes
+    sta modern_mode
     lda #3
     sta lives_left
     lda game_size
@@ -593,7 +593,7 @@ restore:
     bne explode
     tya
     bne :+
-    ldy reveal_zeroes
+    ldy modern_mode
     beq :+
     stx reveal_zero_stack
     ldy #1
@@ -961,6 +961,6 @@ pointer_row .reserve 1
 reveal_zero_stack .reserve MAX_WIDTH * MAX_HEIGHT
 reveal_zero_index .reserve 1 ; Points to first free element in reveal_zero_stack.
 
-reveal_zeroes .reserve 1
+modern_mode .reserve 1
 
 game_map .reserve 1
