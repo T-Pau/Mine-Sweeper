@@ -103,7 +103,7 @@ Press...
   counted up.
 
   You can still play that  version  by
-  pressing F5 at the title screen. 
+  pressing F5. 
                                      5/6
 ---
 

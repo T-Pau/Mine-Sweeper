@@ -113,7 +113,7 @@ keyhandler_table_help {
     .data help_next_page ; space
     .data help_exit ; F1
     .data $0000 ; F3
-    .data $0000 ; F5
+    .data launch_original_game ; F5
     .data enter_menu ; F7 
     .data help_previous_page; return
     .data help_exit; run/stop
