@@ -48,4 +48,4 @@ lines 14
  (F5) Difficulty: {easy}{normal}{hard}
 
 
-           (Space) Start Game
+       (Space or F7) Start Game

@@ -33,92 +33,90 @@ map ' '-'?' $20
 line_length 40
 lines 14
 ---
-                                        
-PRESS...                                
-                                        
-        SPC ........FOR NEXT PAGE       
-                                        
-        CR .....FOR PREVIOUS PAGE       
-                                        
-        R/S ..............TO QUIT       
-                                        
-    CONNECT A MOUSE 1351 AT PORT ONE    
-                                        
-       OR A JOYSTICK  AT PORT TWO       
-                                        
+
+Press...
+
+    Space ...............  next page
+
+    Return ..........  previous page
+
+    Run/Stop ....... return to title
+
+
+    Connect a 1351 mouse at port one
+       or a joystick  at port two
+
                                      1/6
 ---
-                                        
-   THE AIM OF THE GAME IS TO FIND ALL   
-                                        
-   16 MINES.  THEREFORE YOU MAY CLICK   
-                                        
-   ON  SEVERAL  FIELDS.   THE  NUMBER   
-                                        
-   WHICH APPEARS, TELLS  YOU HOW MANY   
-                                        
-   MINES ARE ON  ADJACENT FIELDS.  IF   
-                                        
-   YOU ARE SURE THAT A  CERTAIN FIELD   
-                                        
+
+  The aim of the game is to  find  all
+  mines.
+  
+  If you left-click on  a  field,  the
+  number of adjacent fields with mines
+  is revealed. If you right-click on a
+  field, it is marked as a  mine,  but
+  the game won't tell  you  if  you're
+  right. When you have marked all  the
+  mines and no  other  fields,  you've 
+  won the game.
                                      2/6
 ---
-                                        
-   IS  OCCUPIED  BY  A MINE,  YOU MAY   
-                                        
-   MARK THIS FIELD WITH 'F7'  OR WITH   
-                                        
-   A CLICK ON THE RIGHT MOUSE-BUTTON.   
-                                        
-   IF YOU HAVE  MARKED ALL  16 HIDDEN   
-                                        
-   MINES, YOUR TIME  WILL BE STOPPED.   
-                                        
-   BE CAREFUL,  BECAUSE IF  YOU CLICK   
-                                        
+
+  But be careful: If you left-click on
+  field with a mine, it  explodes  and
+  you loose a life. When you  have  no
+  more lives left, you have  lost  the 
+  game.
+
+  If you are using a  joystick,  press
+  fire to left-click and F7 to  right-
+  click.
+
+
+
                                      3/6
 ---
-                                        
-   ON A FIELD OCCUPIED BY A  MINE YOU   
-                                        
-   WILL  LOOSE  ONE  OF  THREE LIVES.   
-                                        
-   YOU  ARE  ALSO  ABLE  TO  REMOVE A   
-                                        
-   MARKED FIELD BY SIMPLY POINTING ON   
-                                        
-   THAT  CERTAIN  FIELD AND  PRESSING   
-                                        
-   'F7'  OR THE  RIGHT MOUSE  BUTTON.   
-                                        
+
+  In this modern version, you  have  a
+  wide variety of game modes to choose
+  from: 
+   - square or hexagonal fields
+   - four map sizes
+   - three difficulty levels
+
+  The mines  counter  shows  how  many 
+  mines would be  left  if  all  marks 
+  were correct. This can  be  negative
+  if you mark more fields  than  there
+  are mines.
                                      4/6
 ---
-                                        
-   YOU MAY CALL YOURSELF A  CHAMPION,   
-                                        
-   IF YOU ACHIEVE A TIME ...            
-                                        
-   WITH MOUSE:                          
-                                        
-   ..................UNDER ONE MINUTE   
-                                        
-   WITH JOYSTICK:                       
-                                        
-   .......UNDER ONE AND A HALF MINUTE   
-                                        
+  This game was originally released as
+  part of our demo More Than Meets the 
+  Eye in 1992. 
+  
+  You played on  a  10x10  square  map
+  with 16 mines. Clicking on  a  field 
+  with no adjacent mines didn't reveal
+  its neighbors and the mines  display
+  counted up.
+
+  You can still play that  version  by
+  pressing F5 at the title screen. 
                                      5/6
 ---
-                                        
-   WELL, MAY POSEIDON BE WITH YOU...    
-                                        
-   GOOD LUCK !!!                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
+
+
+
+
+        May poseidon be with you.
+
+               Good luck!
+
+
+
+
+
+
                                      6/6

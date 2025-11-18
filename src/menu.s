@@ -191,7 +191,7 @@ menu_handle_left_click {
     lda highlighted_field
     cmp #$0c
     bne :+
-    jmp launch_game
+    jmp launch_modern_game
 :   and #$fc
     sta click_field
     lsr
@@ -326,11 +326,11 @@ next_field:
 
 keyhandler_table_menu {
     .data $0000 ; fire
-    .data launch_game ; space
+    .data launch_modern_game ; space
     .data menu_change_shape ; F1
     .data menu_change_size ; F3
     .data menu_change_difficulty ; F5
-    .data launch_game ; F7
+    .data launch_modern_game ; F7
 }
 
 .macro field line, row, length {
@@ -359,7 +359,7 @@ menu_field_low {
     .data 0
 
     ; Start Game
-    .data <FIELD_ADDRESS(12, 11)
+    .data <FIELD_ADDRESS(12, 6)
 }
 
 menu_field_high {
@@ -381,7 +381,7 @@ menu_field_high {
     .data 0
 
     ; Start Game
-    .data >FIELD_ADDRESS(12, 11)
+    .data >FIELD_ADDRESS(12, 6)
 }
 
 menu_field_length {
@@ -404,7 +404,7 @@ menu_field_length {
     .data 0
 
     ; Start Game
-    .data 18
+    .data 26
 }
 
 game_config {
@@ -438,6 +438,13 @@ game_mines {
     .data  7,  6,  11, 10,  15, 14,  21, 20
     .data 10,  9,  16, 15,  23, 22,  32, 30
     .data 13, 12,  20, 19,  28, 27,  40, 37
+}
+
+game_map {
+    .data GAME_MAP_SMALL
+    .data GAME_MAP_SMALL
+    .data GAME_MAP_LARGE
+    .data GAME_MAP_LARGE
 }
 
 .section reserved

@@ -42,6 +42,14 @@ runlength_encode no
     1992 / 2026
 
 ---
+
+      F1  Help
+
+ F5  Original Game
+
+     Fire or F7
+    Modern Game
+---
    Code by Dillo    
                     
  Intro-GFX by Dillo 
@@ -50,17 +58,10 @@ Game-GFX by Mr.Spock
                     
   Music by Phantom  
 ---
-      F1  Help
 
- F5  Original Game
-
-     Fire or F7
-    Modern Game
----
   Enjoy this small  
   contribution  to  
  your entertainment 
-                    
-                    
+                                        
    Calm sea and a   
  prosperous voyage. 

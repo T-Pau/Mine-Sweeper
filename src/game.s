@@ -56,20 +56,15 @@ display_digit {
 }
 
 launch_original_game {
-    set_bottom_next_action launch_game_faded_out
-    set_bottom_action title_fade_out
-    set_command COMMAND_PREPARE_GAME
-    
-    lda #GAME_MAP_ORIGINAL
-    sta game_map
-    lda #10
-    sta width
-    lda #10
-    sta height
     lda #0
     sta modern_mode
+    lda #GAME_MAP_ORIGINAL
+    sta current_map
     lda #3
     sta lives_left
+    lda #10
+    sta width
+    sta height
     lda #GAME_ORIGINAL_OFFSET_X
     sta offset_x
     lda #GAME_ORIGINAL_OFFSET_Y
@@ -77,20 +72,18 @@ launch_original_game {
     lda #16
     sta mines
 
-    jmp setup_square
+    jsr setup_square
+    jmp launch_game
 }
 
-launch_game {
-    set_bottom_next_action launch_game_faded_out
-    set_bottom_action title_fade_out
-    set_command COMMAND_PREPARE_GAME
+launch_modern_game {
+    lda #1
+    sta modern_mode
 
     ldx game_size
     lda game_map,x
-    sta game_map
+    sta current_map
 
-    lda #1
-    sta modern_mode
     lda #3
     sta lives_left
     lda game_size
@@ -105,24 +98,34 @@ launch_game {
     sta offset_x
     lda game_offset_y,y
     sta offset_y
-    sty tmp
+    sty index + 1
     lda game_difficulty
     asl
     asl
     asl
-    ora tmp
+index:
+    ora #$00
     tay
     lda game_mines,y
     sta mines
 
-    jmp setup_shape
+    jsr setup_shape
+    jmp launch_game
 }
+
+launch_game {
+    set_bottom_next_action launch_game_faded_out
+    set_bottom_action title_fade_out
+    set_command COMMAND_PREPARE_GAME
+    rts
+}
+
 
 ; Set up game map to use.
 ; Arguments:
 ;   A: game map index
 set_game_map {
-    ldx game_map
+    ldx current_map
     lda game_map_lives_position,x
     sta position_lives
     lda game_map_lives_position + 1,x
@@ -143,7 +146,7 @@ set_game_map {
     store_word destination_ptr, game_bitmap
     jsr rl_expand
 
-    ldx game_map
+    ldx current_map
     lda game_map_screen,x
     sta source_ptr
     lda game_map_screen + 1,x
@@ -198,7 +201,7 @@ start_game {
     lda #VIC_SCREEN_WIDTH_40 | VIC_SCREEN_MULTICOLOR
     sta VIC_CONTROL_2
 
-    ldx game_map
+    ldx current_map
     lda game_map_color,x
     sta source_ptr
     lda game_map_color + 1,x
@@ -428,14 +431,21 @@ display_lives_left {
 display_mines {
     copy_word destination_ptr, position_mines
     ldx #DIGIT_EMPTY
+    ldy modern_mode
+    beq original
     lda mines
     sec
     sbc marked_fields
-    bcs :+
+    bcs display
     eor #$ff
     adc #$01
     inx
-:   stx sign + 1
+    bne display
+original:
+    lda marked_fields
+    jmp display
+display:
+    stx sign + 1
     ldx #0
 :   cmp #10
     bcc done
@@ -963,4 +973,4 @@ reveal_zero_index .reserve 1 ; Points to first free element in reveal_zero_stack
 
 modern_mode .reserve 1
 
-game_map .reserve 1
+current_map .reserve 1
