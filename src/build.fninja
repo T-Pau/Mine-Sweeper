@@ -19,6 +19,7 @@ sources :=
     menu.s
     menu-screen.s
     mine-sweeper.s
+    modern-explosion.s
     music.s
     pointer-title.s
     title.s
@@ -39,6 +40,7 @@ build title-graphics.s: convert-characters title-graphics.yaml
 
 build game-maps.s: parallel-struct game-maps.yaml
 
+build modern-explosion.s: convert-spritesheet modern-explosion.yaml
 build help-screens.s: convert-screens help-screens.txt
 build end-screens.s: convert-screens end-screens.txt
 build attract-screens.s: convert-screens attract-screens.txt

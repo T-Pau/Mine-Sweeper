@@ -30,6 +30,8 @@ GAME_MAP_ORIGINAL = 0
 GAME_MAP_SMALL = 2
 GAME_MAP_LARGE = 4
 
+ANIMATION_SPEED = 3
+
 ; XLR8: this should be a function, but that doesn't get evaluated 
 .macro sprite_pointer address, offset = 0 {
     .data (address / 64) & $ff + offset:1
@@ -154,7 +156,12 @@ set_game_map {
     store_word destination_ptr, game_screen
     jsr rl_expand
 
-    rl_expand explosion_sprite, explosion_sprite_rl
+    store_word source_ptr, explosion_sprite_rl
+    lda modern_mode
+    beq :+
+    store_word source_ptr, modern_explosion_sprites
+:   store_word destination_ptr, explosion_sprite
+    jsr rl_expand
 
     rts
 }
@@ -219,6 +226,14 @@ start_game {
     ldx #0
     stx pointer_min_y
 
+    lda modern_mode
+    beq original_sprites
+    ; Set up modern explosion sprite color.
+    lda #0
+    sta VIC_SPRITE_MULTICOLOR
+    beq sprites_done
+
+original_sprites:
     lda #COLOR_RED
     sta VIC_SPRITE_2_COLOR
     lda #COLOR_BROWN
@@ -228,8 +243,10 @@ start_game {
     lda #$04
     sta VIC_SPRITE_MULTICOLOR
 
+sprites_done:
     jsr reset_time
     ldx #$ff
+    stx animation_delay
     stx animation_index
 
     set_irq_table game_irq_table
@@ -480,8 +497,10 @@ game_irq {
 }
 
 start_animation {
-    lda #0
-    sta animation_index
+    ldx #0
+    stx animation_index
+    inx
+    stx animation_delay
 
     ; Calculate sprite X position.
     ldy pointer_row
@@ -506,14 +525,17 @@ start_animation {
     bcc :+
     inx
 :   sta VIC_SPRITE_2_X
+    sta VIC_SPRITE_3_X
+    sta VIC_SPRITE_4_X
+    sta VIC_SPRITE_5_X
+    sta VIC_SPRITE_6_X
+    sta VIC_SPRITE_7_X
     lda VIC_SPRITE_X_MSB
+    and #$03
     cpx #0
     beq :+
-    ora #$04
-    bne high_x
-:   and #$fb
-high_x:
-    sta VIC_SPRITE_X_MSB
+    ora #$fc
+:   sta VIC_SPRITE_X_MSB
 
     ; Calculate sprite Y position.
     tya
@@ -524,20 +546,59 @@ high_x:
     adc offset_y
     adc #$31 + 8 ; offset_y is one row above actual field due to top border of field
     sta VIC_SPRITE_2_Y
+    sta VIC_SPRITE_3_Y
+    sta VIC_SPRITE_4_Y
+    sta VIC_SPRITE_5_Y
+    sta VIC_SPRITE_6_Y
+    sta VIC_SPRITE_7_Y
 
     lda #7
-    sta VIC_SPRITE_ENABLE
+    ldx modern_mode
+    beq :+
+    lda #(1 << (MODERN_EXPLOSION_LAYERS + 2)) - 1
+:   sta VIC_SPRITE_ENABLE
     rts
 }
 
 handle_animation {
+    ldx animation_delay
+    bmi end
+    dex
+    beq :+
+    stx animation_delay
+    rts
+
+:   ldx #ANIMATION_SPEED
+    stx animation_delay
+
     ldx animation_index
-    cpx #$ff
-    beq end
+
+    lda modern_mode
+    beq original
+
+    ; Modern explosion animation
+    cpx #MODERN_EXPLOSION_LAYERS * MODERN_EXPLOSION_SPRITES
+    bcs done
+    ldy #0
+:   lda modern_explosion_pointers,x
+    sta game_screen + $3fa,y
+    lda modern_explosion_colors,x
+    sta VIC_SPRITE_2_COLOR,y
+    inx
+    iny
+    cpy #MODERN_EXPLOSION_LAYERS
+    bne :-
+    stx animation_index
+    rts
+
+original:
+    ; Original explosion animation
     cpx #.sizeof(animation_sprite)
     bcc :+
+done:
     ldx #$ff
     stx animation_index
+    stx animation_delay
     lda #3
     sta VIC_SPRITE_ENABLE
     jmp animation_done
@@ -943,8 +1004,6 @@ music_irq_table {
 animation_sprite {
     .repeat i, 9 {
         sprite_pointer explosion_sprite, i
-        sprite_pointer explosion_sprite, i
-        sprite_pointer explosion_sprite, i
     }
 }
 
@@ -964,6 +1023,7 @@ offset_x .reserve 1
 offset_y .reserve 1
 
 animation_index .reserve 1
+animation_delay .reserve 1
 
 pointer_column .reserve 1
 pointer_row .reserve 1
