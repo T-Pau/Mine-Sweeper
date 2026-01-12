@@ -1,0 +1,7 @@
+runlength-encoding: true
+name-prefix: original_explosion
+sheets:
+  image:
+    filename: original-explosion.png
+  max_layers: 6
+  output-type: frames

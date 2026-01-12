@@ -49,7 +49,6 @@ SPRITE_POINTER(addr) = (addr & $3fff) / 64
 game_bitmap .align $2000 .reserve 8000
 game_screen .align $400 .reserve $400
 game_pointer_sprite .align $40 .reserve $80
-explosion_sprite .align $40 .reserve $40 * MODERN_EXPLOSION_SPRITE_COUNT
+explosion_sprite .align $40 .reserve $40 * ORIGINAL_EXPLOSION_FRAMES ; MODERN_EXPLOSION_LAYERS
 
-; EXPLOSION_SPRITES = SPRITE_POINTER(explosion_sprite) ; XLR8
-EXPLOSION_SPRITES = $10 ; Currently, explosion_sprite is at $8400. xlr8 fails to compute this correctly.
+EXPLOSION_SPRITE_POINTER = SPRITE_POINTER(explosion_sprite)

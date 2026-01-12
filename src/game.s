@@ -31,6 +31,8 @@ GAME_MAP_SMALL = 2
 GAME_MAP_LARGE = 4
 
 ANIMATION_SPEED = 3
+EXPLOSION_X_OFFSET = $18 - 6
+EXPLOSION_Y_OFFSET = $31 + 8 - 1 ; offset_y is one row above actual field due to top border of field
 
 ; XLR8: this should be a function, but that doesn't get evaluated 
 .macro sprite_pointer address, offset = 0 {
@@ -156,11 +158,22 @@ set_game_map {
     store_word destination_ptr, game_screen
     jsr rl_expand
 
-    store_word source_ptr, explosion_sprite_rl
     lda modern_mode
-    beq :+
-    store_word source_ptr, modern_explosion_sprites
-:   store_word destination_ptr, explosion_sprite
+    beq original_explosion
+
+    ldx #0
+    ldy #EXPLOSION_SPRITE_POINTER
+:   tya
+    sta game_screen + $3fa,x
+    iny
+    inx
+    cpx #MODERN_EXPLOSION_LAYERS
+    bne :-
+    rts
+
+original_explosion:
+    store_word source_ptr, explosion_sprite_rl
+    store_word destination_ptr, explosion_sprite
     jsr rl_expand
 
     rts
@@ -521,7 +534,7 @@ start_animation {
     bcc :+
     inx
     clc
-:   adc #$18 
+:   adc #EXPLOSION_X_OFFSET
     bcc :+
     inx
 :   sta VIC_SPRITE_2_X
@@ -544,7 +557,7 @@ start_animation {
     asl
     asl
     adc offset_y
-    adc #$31 + 8 ; offset_y is one row above actual field due to top border of field
+    adc #EXPLOSION_Y_OFFSET
     sta VIC_SPRITE_2_Y
     sta VIC_SPRITE_3_Y
     sta VIC_SPRITE_4_Y
@@ -577,8 +590,32 @@ handle_animation {
     beq original
 
     ; Modern explosion animation
-    cpx #MODERN_EXPLOSION_LAYERS * MODERN_EXPLOSION_SPRITES
+    cpx #MODERN_EXPLOSION_FRAMES
     bcs done
+
+    lda modern_explosion_colors,x
+    sta VIC_SPRITE_2_COLOR
+    lda modern_explosion_colors + MODERN_EXPLOSION_FRAMES,x
+    sta VIC_SPRITE_3_COLOR
+    lda modern_explosion_colors + MODERN_EXPLOSION_FRAMES * 2,x
+    sta VIC_SPRITE_4_COLOR
+    lda modern_explosion_colors + MODERN_EXPLOSION_FRAMES * 3,x
+    sta VIC_SPRITE_5_COLOR
+    lda modern_explosion_colors + MODERN_EXPLOSION_FRAMES * 4,x
+    sta VIC_SPRITE_6_COLOR
+    lda modern_explosion_colors + MODERN_EXPLOSION_FRAMES * 5,x
+    sta VIC_SPRITE_7_COLOR
+
+    lda modern_explosion_sprites_low,x
+    sta source_ptr
+    lda modern_explosion_sprites_high,x
+    sta source_ptr + 1
+    inx 
+    stx animation_index
+    store_word destination_ptr, explosion_sprite
+    jmp rl_expand
+
+.pre_if .false
     ldy #0
 :   lda modern_explosion_pointers,x
     sta game_screen + $3fa,y
@@ -590,6 +627,7 @@ handle_animation {
     bne :-
     stx animation_index
     rts
+.pre_end
 
 original:
     ; Original explosion animation
