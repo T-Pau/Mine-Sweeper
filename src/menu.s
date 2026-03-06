@@ -117,6 +117,7 @@ in_field:
     beq no_change
     stx store + 1
     ldx highlighted_field
+    bmi store
     ldy #COLOR_GREY_3
     jsr highlight_field
 store:

@@ -25,16 +25,24 @@
 #  IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 bitmaps:
-  - file: game-screen-small.png
+  - file: game-screen-original.png
     unused-colors: [0, 3, 14, 6]
-    name: game_map_small
+    name: game_map_original
     layout: c64-multicolor
     components:
       background:
         object-type: constant
         name: GAME_BACKGROUND_COLOR
+  - file: game-screen-small.png
+    unused-colors: [0, 6, 14, 3]
+    name: game_map_small
+    layout: c64-multicolor
+    components:
+      background:
+        object-type: omit
   - file: game-screen-large.png
-    unused-colors: [0, 3, 14, 6]
+    height: 200
+    unused-colors: [0, 6, 14, 3]
     name: game_map_large
     layout: c64-multicolor
     components:

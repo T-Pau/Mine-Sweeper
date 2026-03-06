@@ -40,7 +40,7 @@ field_icons_square_mask = field_icons_square + FIELD_ICON_ROW_SIZE * 3
 DIGIT_EMPTY = $0a
 DIGIT_MINUS = $0b
 
-DIGITS_RIGHT_OFFSET = .sizeof(digits) / 2 / 8
+DIGITS_RIGHT_OFFSET = .sizeof(digits_modern) / 2 / 8
 
 SPRITE_POINTER(addr) = (addr & $3fff) / 64
 
@@ -50,5 +50,13 @@ game_bitmap .align $2000 .reserve 8000
 game_screen .align $400 .reserve $400
 game_pointer_sprite .align $40 .reserve $80
 explosion_sprite .align $40 .reserve $40 * ORIGINAL_EXPLOSION_FRAMES ; MODERN_EXPLOSION_LAYERS
-
+bottom_sprites .align $40 .reserve 6*$40
 EXPLOSION_SPRITE_POINTER = SPRITE_POINTER(explosion_sprite)
+
+.section code
+
+init_graphics {
+    rl_expand bottom_sprites, game_screen_large_sprites
+    ; TODO: move sprite pointer copy here 
+    rts
+}

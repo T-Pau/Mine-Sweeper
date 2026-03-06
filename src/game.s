@@ -49,7 +49,7 @@ display_digit {
     asl
     asl
     tax
-:   lda digits,x
+:   lda digits_modern,x ; TODO: modern vs original
     sta (destination_ptr),y
     inx
     iny
@@ -434,9 +434,11 @@ display_time {
     jsr display_digit
     lda CIA1_TOD_MINUTES
     and #$0f
+    ldy modern_mode
+    bne :+
     clc 
     adc #DIGITS_RIGHT_OFFSET
-    ldy #$08
+:   ldy #$08
     jsr display_digit
     lda CIA1_TOD_MINUTES
     lsr
@@ -445,9 +447,11 @@ display_time {
     lsr
     bne :+
     lda #DIGIT_EMPTY
-:   clc
+:   ldy modern_mode
+    bne :+
+    clc
     adc #DIGITS_RIGHT_OFFSET
-    ldy #$00
+:   ldy #$00
     jmp display_digit
 }
 
@@ -473,7 +477,6 @@ display_mines {
     bne display
 original:
     lda marked_fields
-    jmp display
 display:
     stx sign + 1
     ldx #0
@@ -502,6 +505,7 @@ sign:
 }
 
 game_irq {
+    jsr display_bottom_sprites
     jsr music_play
     jsr display_time
     jsr handle_input
@@ -1028,10 +1032,165 @@ set_field_icons {
     rts
 }
 
+BOTTOM_SPRITES_X_LEFT = 24
+BOTTOM_SPRITES_X_RIGHT = 24 + 288
+BOTTOM_SPRITES_Y = SCREEN_TOP + 200
+GHOST_BYTE = $bfff ; XLR8: game_screen & $c000 + $3fff
+
+; Wait for raster line
+; Arguments:
+;   Y: line to wait for
+; Preserves:
+;   A, X
+wait_for_line {
+    dey
+:   cpy VIC_RASTER
+    bne :-
+    ldy #8
+:   dey
+    bne :-
+    rts
+}
+
+display_bottom_sprites {
+    lda current_map
+    cmp #GAME_MAP_LARGE
+    beq :+
+    rts
+
+    ; backup sprite registers
+:   lda VIC_SPRITE_ENABLE
+    sta backup_sprite_enable
+    lda VIC_SPRITE_MULTICOLOR
+    sta backup_sprite_multicolor
+    lda VIC_SPRITE_MULTICOLOR_0
+    sta backup_sprite_colors
+    lda VIC_SPRITE_MULTICOLOR_1
+    sta backup_sprite_colors + 1
+    lda VIC_SPRITE_X_MSB
+    sta backup_sprite_coordinates + 12
+    ldx #5
+:   lda VIC_SPRITE_2_X,x
+    sta backup_sprite_coordinates,x
+    lda VIC_SPRITE_5_X,x
+    sta backup_sprite_coordinates + 6,x
+    lda VIC_SPRITE_2_COLOR,x
+    sta backup_sprite_colors + 2,x 
+    lda game_screen + $03fa,x
+    sta backup_sprite_pointers,x
+    dex
+    bpl :-
+
+    ; disable sprites
+    lda #$03
+    sta VIC_SPRITE_ENABLE
+
+    ; set up new sprite registers
+    lda #0
+    sta GHOST_BYTE
+    lda #BOTTOM_SPRITES_Y
+    ldx #10
+:   sta VIC_SPRITE_2_Y,x
+    dex
+    dex
+    bpl :-
+    lda #BOTTOM_SPRITES_X_LEFT
+    sta VIC_SPRITE_2_X
+    sta VIC_SPRITE_6_X
+    lda #BOTTOM_SPRITES_X_LEFT + 24
+    sta VIC_SPRITE_3_X
+    lda #<BOTTOM_SPRITES_X_RIGHT
+    sta VIC_SPRITE_4_X
+    sta VIC_SPRITE_7_X
+    lda #<(BOTTOM_SPRITES_X_RIGHT + 24)
+    sta VIC_SPRITE_5_X
+    lda VIC_SPRITE_X_MSB
+    and #%00000011
+    ora #%10110000
+    sta VIC_SPRITE_X_MSB
+    lda #%00111100
+    sta VIC_SPRITE_MULTICOLOR
+    lda #%11000000
+    sta VIC_SPRITE_EXPAND_X
+    lda #COLOR_LIGHT_RED
+    sta VIC_SPRITE_MULTICOLOR_0
+    lda #COLOR_ORANGE
+    sta VIC_SPRITE_MULTICOLOR_1
+    lda #COLOR_RED
+    sta VIC_SPRITE_2_COLOR
+    sta VIC_SPRITE_3_COLOR
+    lda #COLOR_GREY_2
+    sta VIC_SPRITE_4_COLOR
+    lda #COLOR_BROWN
+    sta VIC_SPRITE_6_COLOR
+    sta VIC_SPRITE_7_COLOR
+    ldx #5
+    sec
+    lda #SPRITE_POINTER(bottom_sprites) + 5
+:   sta game_screen + $3fa,x
+    sbc #1
+    dex
+    bpl :-
+
+    ldy #SCREEN_TOP + 199
+    jsr wait_for_line
+
+    set_vic_24_lines
+
+    lda #$ff
+    sta VIC_SPRITE_ENABLE
+
+    ldx #COLOR_GREY_3
+    ldy #SCREEN_TOP + 201
+    jsr wait_for_line
+    stx VIC_BACKGROUND_COLOR
+
+    lda #COLOR_BLACK
+    ldy #<(SCREEN_TOP + 212)
+    jsr wait_for_line
+    ldy #7
+:   dey
+    bne :-
+    nop
+    sta VIC_BACKGROUND_COLOR
+
+    ldy #<(SCREEN_TOP + 222)
+    jsr wait_for_line
+
+    ; restore sprite registers
+    lda backup_sprite_multicolor
+    sta VIC_SPRITE_MULTICOLOR
+    lda backup_sprite_colors
+    sta VIC_SPRITE_MULTICOLOR_0
+    lda backup_sprite_colors + 1
+    sta VIC_SPRITE_MULTICOLOR_1
+    lda backup_sprite_coordinates + 12
+    sta VIC_SPRITE_X_MSB
+    ldx #5
+:   lda backup_sprite_coordinates,x
+    sta VIC_SPRITE_2_X,x
+    lda backup_sprite_coordinates + 6,x
+    sta VIC_SPRITE_5_X,x
+    lda backup_sprite_colors + 2,x 
+    sta VIC_SPRITE_2_COLOR,x
+    lda backup_sprite_pointers,x
+    sta game_screen + $03fa,x
+    dex
+    bpl :-
+    lda #0
+    sta VIC_SPRITE_EXPAND_X
+    lda backup_sprite_enable
+    sta VIC_SPRITE_ENABLE
+
+    set_vic_25_lines
+
+    rts
+}
+
 .section data
 
 game_irq_table {
-    .data SCREEN_TOP:2, game_irq
+    .data SCREEN_TOP + 184:2, game_irq
 }
 
 
@@ -1072,3 +1231,9 @@ reveal_zero_index .reserve 1 ; Points to first free element in reveal_zero_stack
 modern_mode .reserve 1
 
 current_map .reserve 1
+
+backup_sprite_coordinates .reserve 13
+backup_sprite_colors .reserve 8
+backup_sprite_multicolor .reserve 1
+backup_sprite_pointers .reserve 6
+backup_sprite_enable .reserve 1

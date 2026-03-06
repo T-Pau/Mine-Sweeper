@@ -11,6 +11,7 @@ sources :=
     game-graphics.s
     game-maps.s
     game-screen.s
+    game-screen-large-sprites.s
     help.s
     help-screens.s
     input.s
@@ -48,6 +49,9 @@ build menu-screen.s: convert-screens menu-screen.txt
 build pointer-title.s: convert-sprites pointer.png
     flags = --section graphics_title --align
     name = title_pointer_sprite
+build game-screen-large-sprites.s: convert-sprites game-screen-large-sprites.png
+    flags = --runlength
+    name = game_screen_large_sprites
 build original-explosion.s: convert-sprites original-explosion.png
     flags = --runlength --multicolor --palette ff000000,432b01,6d242b,e9f15e --count ORIGINAL_EXPLOSION_FRAMES
     name = explosion_sprite_rl

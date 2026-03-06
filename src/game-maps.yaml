@@ -66,25 +66,22 @@ fields:
   mines_position:
     default_value: "GAME_BITMAP_OFFSET({{mines_position_x}}, {{mines_position_y}})"
 structs:
-  - 
-    name: original
+  - name: original
     lives_position_x: 38
     lives_position_y: 19
     time_position_x: 34
     time_position_y: 21
     mines_position_x: 36
     mines_position_y: 23
-  -
-    name: small
+  - name: small
     lives_position_x: 38
-    lives_position_y: 19
+    lives_position_y: 16
     time_position_x: 34
-    time_position_y: 21
+    time_position_y: 18
     mines_position_x: 36
-    mines_position_y: 23
-  -
-    name: large
-    position_y: 23
+    mines_position_y: 20
+  - name: large
+    position_y: 24
     lives_position_x: 13
-    time_position_x: 19
-    mines_position_x: 31
+    time_position_x: 20
+    mines_position_x: 32

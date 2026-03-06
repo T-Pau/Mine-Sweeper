@@ -25,6 +25,12 @@
 #  IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 charset:
+  - 
+    name: field_icons_original
+    align: 0x100
+    width: 8
+    height: 8
+    count: 256
   -
     name: field_icons_square
     align: 0x100
@@ -38,15 +44,20 @@ charset:
     height: 8
     count: 256
   -
-    name: digits
+    name: digits_original
+    width: 8
+    height: 8
+    count: 256
+  -
+    name: digits_modern
     width: 8
     height: 8
     count: 256
 
 characters:
   -
-    file: field-icons-square.png
-    charset: 0
+    file: field-icons-original.png
+    charset: field_icons_original
     pixel-size-x: 2
     char-size-x: 2
     char-size-y: 3
@@ -58,8 +69,35 @@ characters:
       c64.light-blue: 2
       c64.blue: 3
   -
+    file: field-icons-original.png
+    charset: field_icons_original
+    offset: 78
+    pixel-size-x: 2
+    char-size-x: 2
+    char-size-y: 3
+    placement: ["01", "23", "45"]
+    palette:
+      transparent: 3
+      c64.black: 0
+      c64.cyan: 0
+      c64.light-blue: 0
+      c64.blue: 0
+  -
     file: field-icons-square.png
-    charset: 0
+    charset: field_icons_square
+    pixel-size-x: 2
+    char-size-x: 2
+    char-size-y: 3
+    placement: ["01", "23", "45"]
+    palette:
+      transparent: 0
+      c64.black: 0
+      c64.blue: 1
+      c64.light-blue: 2
+      c64.cyan: 3
+  -
+    file: field-icons-square.png
+    charset: field_icons_square
     offset: 78
     pixel-size-x: 2
     char-size-x: 2
@@ -73,7 +111,7 @@ characters:
       c64.blue: 0
   -
     file: field-icons-hex.png
-    charset: 1
+    charset: field_icons_hex
     pixel-size-x: 2
     char-size-x: 2
     char-size-y: 3
@@ -81,12 +119,12 @@ characters:
     palette:
       transparent: 0
       c64.black: 0
-      c64.cyan: 1
+      c64.blue: 1
       c64.light-blue: 2
-      c64.blue: 3
+      c64.cyan: 3
   -
     file: field-icons-hex.png
-    charset: 1
+    charset: field_icons_hex
     offset: 78
     pixel-size-x: 2
     char-size-x: 2
@@ -99,10 +137,19 @@ characters:
       c64.light-blue: 0
       c64.blue: 0
   -
-    file: digits.png
-    charset: 2
+    file: digits-original.png
+    charset: digits_original
     pixel-size-x: 2
     palette:
       white: 0
       grey-50: 1
       black: 2
+  -
+    file: digits-modern.png
+    charset: digits_modern
+    pixel-size-x: 2
+    palette:
+      c64.black: 0
+      c64.grey-1: 1
+      c64.grey-2: 2
+      c64.white: 3

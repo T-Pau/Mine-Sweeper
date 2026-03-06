@@ -42,6 +42,7 @@ tmp .reserve 1
     sta VIC_BORDER_COLOR
     sta VIC_BACKGROUND_COLOR
     jsr init_input
+    jsr init_graphics
     jsr music_init
     lda #0
     sta current_command
