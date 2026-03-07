@@ -41,21 +41,27 @@ EXPLOSION_Y_OFFSET = $31 + 8 - 1 ; offset_y is one row above actual field due to
 
 .section code
 
+.macro set_digits digits {
+    store_word current_digits, digits
+}
+
 ; Arguments:
 ;   A: digit
 ;   Y: x coordinate * 8
 display_digit {
+.public current_digits = load + 1
     asl
     asl
     asl
     tax
-:   lda digits_modern,x ; TODO: modern vs original
+load:
+    lda digits_modern,x ; TODO: modern vs original
     sta (destination_ptr),y
     inx
     iny
     tya
     and #$07
-    bne :-
+    bne load
     rts
 }
 
@@ -80,6 +86,7 @@ launch_original_game {
     jsr compute_row_shifts
     ldx #>field_icons_original
     jsr set_field_icons
+    set_digits digits_original
     jmp launch_game
 }
 
@@ -117,6 +124,7 @@ index:
     sta mines
 
     jsr setup_shape
+    set_digits digits_modern
     jmp launch_game
 }
 
