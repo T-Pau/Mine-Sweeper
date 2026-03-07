@@ -24,10 +24,6 @@
 ;  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 ;  IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-game_map_original_bitmap = game_map_small_bitmap
-game_map_original_screen = game_map_small_screen
-game_map_original_color = game_map_small_color
-
 
 ICON_FLAG = 9
 ICON_SKULL = 10
@@ -57,6 +53,16 @@ EXPLOSION_SPRITE_POINTER = SPRITE_POINTER(explosion_sprite)
 
 init_graphics {
     rl_expand bottom_sprites, game_screen_large_sprites
-    ; TODO: move sprite pointer copy here 
+
+    ldx #$80
+:   lda title_pointer_sprite,x
+    sta game_pointer_sprite,x
+    dex
+    bpl :-
+    ldx #SPRITE_POINTER(game_pointer_sprite)
+    stx game_screen + $3f8
+    inx
+    stx game_screen + $3f9
+    
     rts
 }

@@ -26,6 +26,10 @@
 
 .include "c64-basic.target"
 
+.section data .extend {
+    address: $8000 - $afff
+} 
+
 .section graphics_title {
     address [
         : $0801 - $0fff
@@ -36,7 +40,9 @@
 .section graphics_game {
     type: reserve_only
     address [
-        : $8000 - $8fff
-        : $a000 - $bfff
+        : $c000 - $cfff
+        : $e000 - $ffff
     ]
 }
+
+.define USE_OWN_END_OF_INTERRUPT

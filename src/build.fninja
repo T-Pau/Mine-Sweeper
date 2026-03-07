@@ -21,6 +21,7 @@ sources :=
     mine-sweeper.s
     modern-explosion.s
     music.s
+    no-kernal.s
     original-explosion.s
     pointer-title.s
     title.s

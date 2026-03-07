@@ -76,7 +76,10 @@ launch_original_game {
     lda #16
     sta mines
 
-    jsr setup_square
+    lda #0
+    jsr compute_row_shifts
+    ldx #>field_icons_original
+    jsr set_field_icons
     jmp launch_game
 }
 
@@ -194,15 +197,6 @@ launch_game_done {
 
 prepare_game {
     jsr set_game_map
-    ldx #$80
-:   lda title_pointer_sprite,x
-    sta game_pointer_sprite,x
-    dex
-    bpl :-
-    ldx #SPRITE_POINTER(game_pointer_sprite)
-    stx game_screen + $3f8
-    inx
-    stx game_screen + $3f9
 
     jsr init_field
     jsr compute_field_positions
@@ -215,7 +209,7 @@ prepare_game {
 start_game {
     lda #GAME_BACKGROUND_COLOR
     sta VIC_BACKGROUND_COLOR
-    set_vic_bank $8000
+    set_vic_bank $c000
     set_vic_text game_screen, game_bitmap
     set_vic_bitmap_mode
     lda #VIC_SCREEN_WIDTH_40 | VIC_SCREEN_MULTICOLOR
@@ -972,6 +966,7 @@ destination_down:
     iny
     cpy #$10
     bne source_up
+
     rts
 }
 

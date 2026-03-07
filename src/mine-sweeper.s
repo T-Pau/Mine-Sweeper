@@ -38,6 +38,10 @@ tmp .reserve 1
 .section code
 
 .public start {
+    sei
+    lda #$36
+    sta $01
+
     lda #COLOR_BLACK
     sta VIC_BORDER_COLOR
     sta VIC_BACKGROUND_COLOR
@@ -51,8 +55,7 @@ tmp .reserve 1
     jsr setup_title
     jsr attract_faded_out
     jsr init_irq
-    lda #$36
-    sta $01
+    jsr init_no_kernal
     jmp command_loop
 }
 

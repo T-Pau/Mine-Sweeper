@@ -42,6 +42,8 @@ FIELD_BORDER = $ff
 
 ; Initialize game field
 init_field {
+    enable_kernal ; needed for random number generator
+
     lda mines
     sta marked_mines
     ldx width
@@ -100,9 +102,6 @@ row_end:
 
     jsr calculate_neighbors
 
-    lda #$37
-    sta $01
-
     ; Set mines.
     jsr RND
 :   jsr RND1
@@ -120,8 +119,7 @@ row_end:
     lda #0
     sta marked_fields
 
-    lda #$36
-    sta $01
+    disable_kernal
 
     rts
 }
