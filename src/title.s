@@ -70,6 +70,7 @@ text_charset_lda:
     sty VIC_CONTROL_2
     sta VIC_VIDEO_ADDRESS
     jsr music_play
+    inc frames
     rts
 }
 

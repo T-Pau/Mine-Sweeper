@@ -509,6 +509,7 @@ sign:
 game_irq {
     jsr display_bottom_sprites
     jsr music_play
+    inc frames
     jsr display_time
     jsr handle_input
     jsr handle_animation
