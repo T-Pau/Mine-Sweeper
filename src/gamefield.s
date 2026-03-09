@@ -24,9 +24,6 @@
 ;  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 ;  IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-RND = $e09e
-RND1 = $e0be
-FAC = $61
 
 MAX_WIDTH = 18
 MAX_HEIGHT = 11
@@ -42,8 +39,6 @@ FIELD_BORDER = $ff
 
 ; Initialize game field
 init_field {
-    enable_kernal ; needed for random number generator
-
     lda mines
     sta marked_mines
     ldx width
@@ -103,9 +98,9 @@ row_end:
     jsr calculate_neighbors
 
     ; Set mines.
-    jsr RND
-:   jsr RND1
-    ldy FAC + 3
+    jsr seed_random
+:   jsr random
+    tay
     cpy gamefield_size
     bcs :-
     lda gamefield,y
@@ -118,8 +113,6 @@ row_end:
     bne :-
     lda #0
     sta marked_fields
-
-    disable_kernal
 
     rts
 }

@@ -24,6 +24,7 @@ sources :=
     no-kernal.s
     original-explosion.s
     pointer-title.s
+    random.s
     title.s
     title-graphics.s
 

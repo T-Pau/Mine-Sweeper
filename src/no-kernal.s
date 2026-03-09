@@ -51,19 +51,29 @@ reset_proxy {
 cpu_vectors {
     .data nmi_proxy ; NMI
     .data reset_proxy ; reset
-    .data start_of_irq ; IRQ
+    .data irq_trampoline ; IRQ
 }
 
 init_no_kernal {
     sei
     disable_kernal
 
+    lda #$4c
+    sta irq_trampoline
+    lda #<start_of_irq
+    sta irq_trampoline+1
+    lda #>start_of_irq
+    sta irq_trampoline+2
+
     ldx #5
 :   lda cpu_vectors,x
     sta $fffa,x
     dex
     bpl :-
-    cli
 
     rts
 }
+
+.section zero_page
+
+irq_trampoline .reserve 3
