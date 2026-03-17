@@ -51,7 +51,7 @@ reset_proxy {
 cpu_vectors {
     .data nmi_proxy ; NMI
     .data reset_proxy ; reset
-    .data irq_trampoline ; IRQ
+    .data irq_trampoline:2 ; IRQ
 }
 
 init_no_kernal {
@@ -64,6 +64,11 @@ init_no_kernal {
     sta irq_trampoline+1
     lda #>start_of_irq
     sta irq_trampoline+2
+
+    lda #<end_of_irq
+    sta IRQ_VECTOR
+    lda #>end_of_irq
+    sta IRQ_VECTOR + 1
 
     ldx #5
 :   lda cpu_vectors,x

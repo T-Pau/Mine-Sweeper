@@ -622,20 +622,6 @@ handle_animation {
     store_word destination_ptr, explosion_sprite
     jmp rl_expand
 
-.pre_if .false
-    ldy #0
-:   lda modern_explosion_pointers,x
-    sta game_screen + $3fa,y
-    lda modern_explosion_colors,x
-    sta VIC_SPRITE_2_COLOR,y
-    inx
-    iny
-    cpy #MODERN_EXPLOSION_LAYERS
-    bne :-
-    stx animation_index
-    rts
-.pre_end
-
 original:
     ; Original explosion animation
     cpx #.sizeof(animation_sprite)
@@ -676,29 +662,6 @@ done:
 ; Arguments:
 ;   X: field index
 handle_left_click {
-.pre_if .false
-    txa
-    clc
-    sbc row_span
-    sta offset + 1
-    ldy #0
-loop:
-    lda neighbor_offsets,y
-    clc
-offset:
-    adc #0
-    tax
-    lda #1
-    sty restore + 1
-    jsr display_field_icon    
-restore:
-    ldy #0
-    iny
-    cpy neighbor_count
-    bne loop
-    rts
-.pre_end
-
     lda gamefield,x
     tay
     cmp #FIELD_MARKED
@@ -1039,7 +1002,6 @@ set_field_icons {
 BOTTOM_SPRITES_X_LEFT = 24
 BOTTOM_SPRITES_X_RIGHT = 24 + 288
 BOTTOM_SPRITES_Y = SCREEN_TOP + 200
-GHOST_BYTE = $bfff ; XLR8: game_screen & $c000 + $3fff
 
 ; Wait for raster line
 ; Arguments:
@@ -1090,8 +1052,6 @@ display_bottom_sprites {
     sta VIC_SPRITE_ENABLE
 
     ; set up new sprite registers
-    lda #0
-    sta GHOST_BYTE
     lda #BOTTOM_SPRITES_Y
     ldx #10
 :   sta VIC_SPRITE_2_Y,x

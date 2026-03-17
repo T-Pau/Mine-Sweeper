@@ -27,8 +27,12 @@
 .include "c64-basic.target"
 
 .section data .extend {
-    address: $8000 - $afff
+    address: $8000 - $bfff
 } 
+
+.section reserved .extend {
+    address: $8000 - $bfff
+}
 
 .section graphics_title {
     address [
