@@ -60,6 +60,7 @@ Press...
   right. When you have marked all  the
   mines and no  other  fields,  you've 
   won the game.
+
                                      2/6
 ---
 
@@ -70,8 +71,8 @@ Press...
   game.
 
   If you are using a  joystick,  press
-  fire to left-click and F7 to  right-
-  click.
+  fire to left-click and F7 or  second
+  button to right-click.
 
 
 
@@ -104,6 +105,7 @@ Press...
 
   You can still play that  version  by
   pressing F5. 
+  
                                      5/6
 ---
 

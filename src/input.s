@@ -31,9 +31,6 @@
 
 ; Initialize input handling.
 .public init_input {
-    lda #$00
-    sta last_potx
-    sta last_poty
     sta previous_buttons
     sta pointer_x
     sta pointer_x + 1
@@ -43,6 +40,11 @@
     store_word pointer_max_x, 320
     lda #200
     sta pointer_max_y
+    jsr select_pots1
+    lda SID_POT_X
+    sta last_potx
+    lda SID_POT_Y
+    sta last_poty
     rts
 }
 
@@ -52,7 +54,9 @@
 ;   pointer_y: new y position
 ;   buttons: buttons newly pressed
 .public read_input {
+    jsr select_pots1
     jsr read_mouse
+    jsr select_pots2
     jsr read_joystick
     jsr constrain_pointer
     jsr update_pointer
@@ -187,7 +191,14 @@ read_buttons:
 }
 
 read_joystick {
-    ldx #$e0
+    ; 2nd button
+    lda SID_POT_X
+    bmi :+
+    lda #2
+    ora buttons
+    sta buttons
+
+:   ldx #$e0
     stx CIA1_DDRA
     ldx CIA1_PRA
     txa
@@ -238,7 +249,8 @@ right_done:
     and #$10
     bne :+
     inx
-:   lda #$ff
+:   ; F7
+    lda #$ff
     sta CIA1_DDRA
     lda #$fe
     sta CIA1_PRA
@@ -251,6 +263,27 @@ right_done:
     ora buttons
     sta buttons
     rts
+}
+
+select_pots1 {
+    lda #$40
+.public select_pot:
+    ldx #$c0
+    stx CIA1_DDRA
+    sta CIA1_PRA
+    ldy #14
+loop:
+    ldx VIC_RASTER
+:   cpx VIC_RASTER
+    beq :-
+    dey
+    bne loop
+    rts
+}
+
+select_pots2 {
+    lda #$80
+    jmp select_pot
 }
 
 .section reserved
