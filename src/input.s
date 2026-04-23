@@ -29,6 +29,11 @@
 .public BUTTON_LEFT = $01
 .public BUTTON_RIGHT = $02
 
+.macro clear_used_mouse {
+    lda #0
+    sta used_mouse
+}
+
 ; Initialize input handling.
 .public init_input {
     sta previous_buttons
@@ -145,6 +150,8 @@ move_right:
     inc pointer_x + 1
 end_x:
     stx last_potx
+    ldx #1
+    stx used_mouse
 read_y:
     ldx SID_POT_Y
     cpx #$7f
@@ -174,6 +181,8 @@ move_up:
 end_y:
     sta pointer_y
     stx last_poty
+    ldx #1
+    stx used_mouse
 read_buttons:
     ldx #0
     lda #$e0
@@ -291,6 +300,7 @@ select_pots2 {
 .public pointer_x .reserve 2
 .public pointer_y .reserve 1
 .public buttons .reserve 1
+.public used_mouse .reserve 1
 
 .public pointer_min_x .reserve 2
 .public pointer_max_x .reserve 2

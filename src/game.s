@@ -215,6 +215,7 @@ prepare_game {
 }
 
 start_game {
+    clear_used_mouse
     lda #GAME_BACKGROUND_COLOR
     sta VIC_BACKGROUND_COLOR
     set_vic_bank $c000
