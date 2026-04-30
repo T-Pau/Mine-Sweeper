@@ -39,27 +39,27 @@ GAME_DIFFICULTY_HARD = 2
 .section code
 
 enter_menu {
-    set_bottom_next_action show_menu
     set_bottom_action title_fade_out
+    add_bottom_action show_menu
     rts
 }
 
 show_menu {
-    lda #VIC_VIDEO_ADDRESS(SCREEN_RAM, charset_1x1)
+    lda #CHARSET_1x1
     sta text_charset
     lda #COMMAND_COPY_MENU_SCREEN
     sta current_command
-    set_bottom_next_action menu_fade_in
     set_bottom_action wait_for_command
+    add_bottom_action menu_setup_fields
+    add_bottom_action title_fade_in
+    add_bottom_action setup_menu
     set_keyhandler_table keyhandler_table_menu
     lda #0
     sta menu_update_screen
     rts
 }
 
-menu_fade_in {
-    set_bottom_next_action setup_menu
-    set_bottom_action title_fade_in
+menu_setup_fields {
     lda #1
     sta menu_update_screen
     ldx game_shape
@@ -74,7 +74,7 @@ menu_fade_in {
     adc #8
     tax
     jsr menu_toggle_field
-    rts
+    jmp activate_next_bottom_action
 }
 
 setup_menu {

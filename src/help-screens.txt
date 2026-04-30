@@ -26,9 +26,7 @@
 
 name help_screens
 
-map '@'-'_' $00
-map 'a'-'z' $01
-map ' '-'?' $20
+.include "mapping-1x1.inc"
 
 line_length 40
 lines 14
@@ -45,8 +43,6 @@ Press...
 
     Connect a 1351 mouse at port one
        or a joystick  at port two
-
-                                     1/6
 ---
 
   The aim of the game is to  find  all
@@ -60,8 +56,6 @@ Press...
   right. When you have marked all  the
   mines and no  other  fields,  you've 
   won the game.
-
-                                     2/6
 ---
 
   But be careful: If you left-click on
@@ -73,10 +67,6 @@ Press...
   If you are using a  joystick,  press
   fire to left-click and F7 or  second
   button to right-click.
-
-
-
-                                     3/6
 ---
 
   In this modern version, you  have  a
@@ -91,8 +81,27 @@ Press...
   were correct. This can  be  negative
   if you mark more fields  than  there
   are mines.
-                                     4/6
 ---
+
+  Score is based on  game  mode,  time
+  taken, lives  left,  and  controller 
+  used.
+---
+
+  The high score table uses symbols to
+  show the game mode played:
+
+  Shape:      □: square, ⬡: hex
+
+  Size:       Ⓣ: tiny, Ⓢ: small, 
+              Ⓜ: medium, Ⓑ: big
+
+  Difficulty: Ⅰ: easy, Ⅱ: normal, 
+              Ⅲ: hard
+
+  Controller: 🕹: joystick, 🖱: mouse
+---
+
   This game was originally released as
   part of our demo More Than Meets the 
   Eye in 1992. 
@@ -106,7 +115,6 @@ Press...
   You can still play that  version  by
   pressing F5. 
   
-                                     5/6
 ---
 
 
@@ -115,10 +123,3 @@ Press...
         May poseidon be with you.
 
                Good luck!
-
-
-
-
-
-
-                                     6/6

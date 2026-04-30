@@ -24,44 +24,25 @@
 ;  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 ;  IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-name attract_screens
+name title_screen_highscore
+page_mode single
 
-map '@'-'_' $00
-map 'a'-'z' $01
-map ' '-'?' $20
+.include "mapping-1x1.inc"
 
-line_length 20
-lines 7
+line_length 40
+lines 14
 runlength_encode no
 ---
 
-         A          
-                    
-  T'Pau Production
-                    
-    1992 / 2026
+              top sweepers
 
----
-
-      F1  Help
-
- F5  Original Game
-
-     Fire or F7
-    Modern Game
----
-   Code by Dillo    
-                    
- Intro-GFX by Dillo 
-                    
-Game-GFX by Mr.Spock
-                    
-  Music by Phantom  
----
-
-  Enjoy this small  
-  contribution  to  
- your entertainment 
-                                        
-   Calm sea and a   
- prosperous voyage. 
+       1.
+       2.
+       3.
+       4.
+       5.
+       6.
+       7.
+       8.
+       9.
+      10.

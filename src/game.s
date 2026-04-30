@@ -128,9 +128,11 @@ index:
     jmp launch_game
 }
 
+
 launch_game {
-    set_bottom_next_action launch_game_faded_out
     set_bottom_action title_fade_out
+    add_bottom_action wait_for_command
+    add_bottom_action launch_game_done
     set_command COMMAND_PREPARE_GAME
     rts
 }
@@ -190,11 +192,6 @@ original_explosion:
     rts
 }
 
-launch_game_faded_out {
-    set_bottom_next_action launch_game_done
-    set_bottom_action wait_for_command
-    rts
-}
 
 launch_game_done {
     lda #COMMAND_START_GAME
@@ -352,19 +349,19 @@ game_won {
     tax
     and #$f
     ora #$30
-    sta screen_won + $61
+    sta title_screen_won + $61
     txa
     lsr
     lsr
     lsr
     lsr
     ora #$30
-    sta screen_won + $60
+    sta title_screen_won + $60
     lda CIA1_TOD_MINUTES
     tax
     and #$f
     ora #$30
-    sta screen_won + $5e
+    sta title_screen_won + $5e
     txa
     lsr
     lsr
@@ -372,23 +369,22 @@ game_won {
     lsr
     ; TODO: Space instead of leading 0?
     ora #$30
-    sta screen_won + $5d
-    lda #<screen_won
-    ldy #>screen_won
+    sta title_screen_won + $5d
+    lda #<title_screen_won
+    ldy #>title_screen_won
     jmp end_game
 }
 
 game_lost {
-    lda #<screen_failed
-    ldy #>screen_failed
+    lda #<title_screen_failed
+    ldy #>title_screen_failed
     jmp end_game
 }
 
 end_game {
     jsr copy_2x2_screen
-    set_bottom_action title_fade_in
-    set_bottom_next_action attract_faded_in
     jsr setup_title
+    jmp setup_attract_fade
     rts
 }
 

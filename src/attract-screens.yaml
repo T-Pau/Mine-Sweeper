@@ -1,0 +1,21 @@
+settings:
+  include_count: false
+  prefix: attract_screens_
+
+fields:
+  name:
+    type: omit
+  address_low:
+    default_value: "<title_screen_{{name}}"
+  address_high:
+    default_value: ">title_screen_{{name}}"
+  charset:
+    default_value: "2"
+
+structs:
+  - name: copyright
+  - name: legend
+  - name: highscore
+    charset: "1"
+  - name: credits
+  - name: enjoy

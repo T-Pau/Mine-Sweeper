@@ -29,27 +29,26 @@
 show_help {
     lda #0
     sta current_help_page
-    set_bottom_next_action help_show_page
     set_bottom_action title_fade_out
+    add_bottom_action help_show_page
     set_keyhandler_table keyhandler_table_help
     rts
 }
 
 help_show_page {
-    lda #VIC_VIDEO_ADDRESS(SCREEN_RAM, charset_1x1)
+    lda #CHARSET_1x1
     sta text_charset
     lda #COMMAND_COPY_HELP_SCREEN
     sta current_command
-    set_bottom_next_action title_fade_in
     set_bottom_action wait_for_command
+    add_bottom_action title_fade_in
     rts
 }
 
 wait_for_command {
     lda current_command
     bne :+
-    jsr activate_bottom_next_action
-    set_bottom_next_action title_nop
+    jsr activate_next_bottom_action
 :   rts
 }
 
@@ -72,8 +71,8 @@ help_next_page {
     bne :+
     ldx #0
 :   stx current_help_page
-    set_bottom_next_action help_show_page
     set_bottom_action title_fade_out
+    add_bottom_action help_show_page
     rts
 }
 
@@ -84,25 +83,25 @@ help_previous_page {
     bpl :+
     ldx #.sizeof(help_screens) - 2
 :   stx current_help_page
-    set_bottom_next_action help_show_page
     set_bottom_action title_fade_out
+    add_bottom_action help_show_page
     rts
 }
 
 help_exit {
-    set_bottom_next_action enter_attract
     set_bottom_action title_fade_out
+    add_bottom_action enter_attract
     rts
 }
 
 enter_attract {
     set_keyhandler_table keyhandler_table_title
-    lda #VIC_VIDEO_ADDRESS(SCREEN_RAM, charset_2x2)
+    lda #CHARSET_2x2
     sta text_charset
     lda #COMMAND_SHOW_ATTRACT
     sta current_command
-    set_bottom_next_action attract_faded_out
     set_bottom_action wait_for_command
+    add_bottom_action attract_faded_out
     rts
 }
 

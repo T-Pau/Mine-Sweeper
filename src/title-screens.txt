@@ -24,8 +24,7 @@
 ;  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 ;  IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-name screen
-page_mode objects
+name title_screen
 
 map '@'-'_' $00
 map 'a'-'z' $01
@@ -34,23 +33,64 @@ map ' '-'?' $20
 line_length 20
 lines 7
 runlength_encode no
+page_mode objects
+---
+copyright
+
+
+         A          
+                    
+  T'Pau Production
+                    
+    1992 / 2026
+
+---
+legend
+
+
+      F1  Help
+
+ F5  Original Game
+
+     Fire or F7
+    Modern Game
+---
+credits
+
+   Code by Dillo    
+                    
+ Intro-GFX by Dillo 
+                    
+Game-GFX by Mr.Spock
+                    
+  Music by Phantom  
+---
+enjoy
+
+
+  Enjoy this small  
+  contribution  to  
+ your entertainment 
+                                        
+   Calm sea and a   
+ prosperous voyage. 
 ---                    
 won
 
-  CONGRATULATIONS!  
+  Congratulations!  
                     
-    YOU CLEARED     
-    THIS FIELD.     
-  YOUR TIME: 01:18  
+    You cleared     
+    this field.     
+  Your Time: 01:18  
                     
-    A GOOD TIME!    
+    A good time!    
 ---                    
 failed
 
-     SORRY PAL!     
+     Sorry pal!     
                     
-     YOU FAILED     
-  IN YOUR MISSION.  
+     You failed     
+  in your mission.  
                     
-   DON'T GIVE UP,   
-   TRY IT AGAIN!!   
+   Don't give up,   
+   try it again!!   

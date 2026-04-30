@@ -46,6 +46,8 @@ tmp .reserve 1
     jsr init_input
     jsr init_graphics
     jsr music_init
+    store_word destination_ptr, title_screen_highscore + 40*3 + 10
+    jsr render_highscore_table
     lda #0
     sta current_command
     sta last_key
@@ -61,6 +63,51 @@ TEXT_SCREEN_START = SCREEN_RAM + 11 * 40
 TEXT_SCREEN_LINES = 14
 
 TEXT_COLOR_START = COLOR_RAM + 11 * 40
+
+; Copy 1x1 page to screen
+; Arguments:
+;   A/Y: page address
+copy_1x1_screen {
+    sta source_1 + 1
+    sty source_1 + 2
+    clc
+    adc #140
+    bcc :+
+    iny
+    clc
+:   sta source_2 + 1
+    sty source_2 + 2
+    adc #140
+    bcc :+
+    iny
+    clc
+:   sta source_3 + 1
+    sty source_3 + 2
+    adc #140
+    bcc :+
+    iny
+:   sta source_4 + 1
+    sty source_4 + 2
+
+    ldx #140
+    ldy #139
+source_1:
+    lda $1000,y
+    sta TEXT_SCREEN_START,y
+source_2:
+    lda $1000,y
+    sta TEXT_SCREEN_START + 140,y
+source_3:
+    lda $1000,y
+    sta TEXT_SCREEN_START + 280,y
+source_4:
+    lda $1000,y
+    sta TEXT_SCREEN_START + 420,y
+    dey
+    dex
+    bne source_1
+    rts
+}
 
 ; Copy 2x2 page to screen
 ; Arguments:
@@ -168,7 +215,7 @@ setup_title {
 }
 
 show_attract {
-    lda #VIC_VIDEO_ADDRESS(SCREEN_RAM, charset_2x2)
+    lda #CHARSET_2x2
     sta text_charset
     set_keyhandler_table keyhandler_table_title
     ldx #0

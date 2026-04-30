@@ -27,11 +27,7 @@
 name menu_screen
 page_mode single
 
-map '@'-'_' $00
-map 'a'-'z' $01
-map ' '-'?' $20
-map '{' $1e 
-map '}' $1f
+.include "mapping-1x1.inc"
 
 line_length 40
 lines 14
