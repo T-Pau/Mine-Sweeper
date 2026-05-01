@@ -15,11 +15,9 @@ sources :=
     help.s
     help-screens.s
     highscore.s
-    highscore-screen.s
     input.s
     keyboard.s
     menu.s
-    menu-screen.s
     mine-sweeper.s
     modern-explosion.s
     music.s
@@ -27,9 +25,11 @@ sources :=
     original-explosion.s
     pointer-title.s
     random.s
+    screens-1x1.s
+    screens-1x1-rl.s
+    screens-2x2.s
     title.s
     title-graphics.s
-    title-screens.s
 
 programs := mine-sweeper.prg
 
@@ -49,9 +49,9 @@ build attract-screens.s: parallel-struct attract-screens.yaml
 
 build modern-explosion.s: convert-spritesheet modern-explosion.yaml
 build help-screens.s: convert-screens help-screens.txt
-build title-screens.s: convert-screens title-screens.txt
-build menu-screen.s: convert-screens menu-screen.txt
-build highscore-screen.s: convert-screens highscore-screen.txt
+build screens-1x1.s: convert-screens screens-1x1.txt
+build screens-1x1-rl.s: convert-screens screens-1x1-rl.txt
+build screens-2x2.s: convert-screens screens-2x2.txt
 build pointer-title.s: convert-sprites pointer.png
     flags = --section graphics_title --align
     name = title_pointer_sprite

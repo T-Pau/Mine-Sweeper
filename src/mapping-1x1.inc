@@ -22,3 +22,6 @@ map 'Ⅲ' $48 ; hard
 ; Controller
 map '🕹' $49 ; joystick
 map '🖱' $4a ; mouse
+
+; Lives
+map '♥' $4b ; live

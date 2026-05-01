@@ -345,6 +345,13 @@ column_loop:
 }
 
 game_won {
+    ldy modern_mode
+    beq :+
+    jmp display_score
+:   jmp game_won_original    
+}
+
+game_won_original {
     lda CIA1_TOD_SECONDS
     tax
     and #$f

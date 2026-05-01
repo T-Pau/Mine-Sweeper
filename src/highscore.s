@@ -32,7 +32,7 @@
 ;   0: shape
 ;   1-2: size
 ;   3-4: difficulty
-;   5: controller (0: mouse, 1: joystick)
+;   5: controller (0: joystick, 1: mouse)
 
 HIGHSCORE_OFFSET_NAME = 0
 HIGHSCORE_OFFSET_SCORE = 13
@@ -44,8 +44,59 @@ ICON_OFFSET_SHAPE = $40
 ICON_OFFSET_SIZE = $42
 ICON_OFFSET_DIFFICULTY = $46
 ICON_OFFSET_CONTROLLER = $49
+ICON_OFFSET_LIVE = $4b
+
+SCORE_SCREEN_OFFSET_SHAPE = 40 * 4 + 21
+SCORE_SCREEN_OFFSET_SIZE = SCORE_SCREEN_OFFSET_SHAPE + 1
+SCORE_SCREEN_OFFSET_CONTROLLER = SCORE_SCREEN_OFFSET_SHAPE + 40 * 3
+SCORE_SCREEN_OFFSET_LIVES = SCORE_SCREEN_OFFSET_CONTROLLER + 40
+SCORE_SCREEN_OFFSET_DIFFICULTY = SCORE_SCREEN_OFFSET_LIVES + 40
 
 .section code
+
+; Display score screen after winning.
+display_score {
+    rl_expand TEXT_SCREEN_START, score_screen
+    lda game_shape
+    sta current_game_mode
+    lda game_size
+    asl
+    ora current_game_mode
+    sta current_game_mode
+    lda game_difficulty
+    asl
+    asl
+    asl
+    ora current_game_mode
+    sta current_game_mode
+    lda used_mouse
+    beq :+
+    lda #%100000 
+:   ora current_game_mode
+    sta current_game_mode
+    jsr calculate_score_icons
+
+    lda score_icon_shape
+    sta TEXT_SCREEN_START + SCORE_SCREEN_OFFSET_SHAPE
+    lda score_icon_size
+    sta TEXT_SCREEN_START + SCORE_SCREEN_OFFSET_SIZE
+    lda score_icon_difficulty
+    sta TEXT_SCREEN_START + SCORE_SCREEN_OFFSET_DIFFICULTY
+    lda score_icon_controller
+    sta TEXT_SCREEN_START + SCORE_SCREEN_OFFSET_CONTROLLER
+    ldy lives_left
+    lda #ICON_OFFSET_LIVE
+:   sta TEXT_SCREEN_START + SCORE_SCREEN_OFFSET_LIVES - 1,y
+    dey
+    bne :-
+
+    ; TODO: compute score and rank
+    ; TODO: if in highscore table, set up action to enter name
+    jsr setup_title
+    lda #CHARSET_1x1
+    sta text_charset
+    jmp setup_attract_fade
+}
 
 ; Write high score table to screen.
 ; Arguments:
@@ -60,13 +111,53 @@ loop:
     dey
     bpl :-
 
-    ; Convert score to digits using Double Dabble algorithm.
     ldy #HIGHSCORE_OFFSET_SCORE
     lda (source_ptr),y
     sta current_score
     iny
     lda (source_ptr),y
     sta current_score + 1
+    jsr calculate_score_digits
+    ldy #HIGHSCORE_SCREEN_SCORE_OFFSET
+    jsr print_score
+
+    ; Render game mode icons.
+    ldy #HIGHSCORE_OFFSET_GAME_MODE
+    lda (source_ptr),y
+    jsr calculate_score_icons
+
+    ldy #HIGHSCORE_SCREEN_GAME_MODE_OFFSET
+    ldx #0
+:   lda score_icons,x
+    sta (destination_ptr),y
+    iny
+    inx
+    cpx #4
+    bne :- 
+
+    ; Next entry.
+    lda source_ptr
+    clc
+    adc #16
+    cmp #.sizeof(highscore_table)
+    bne :+
+    rts
+:   sta source_ptr
+    clc
+    lda destination_ptr
+    adc #40
+    sta destination_ptr
+    bcc :+
+    inc destination_ptr + 1
+:   jmp loop
+}
+
+; Convert score to digits using Double Dabble algorithm.
+; Arguments:
+;   current_score: score to convert
+; Result:
+;   score_digits: digits of the score, least significant digit first
+calculate_score_digits {
     lda #0
     sta score_digits
     sta score_digits + 1
@@ -93,9 +184,15 @@ adjust_digits:
     rol score_digits + 4
     dex
     bpl process_bit
+    rts
+}
 
-    ; Print score.
-    ldy #HIGHSCORE_SCREEN_SCORE_OFFSET
+; Print score to screen.
+; Arguments:
+;   Y: offset of the first digit in screen memory
+;   score_digits: digits of the score, least significant digit first
+;   destination_ptr: pointer to screen
+print_score {
     ldx #4
     ; Skip leading zeros.
 :   lda score_digits,x
@@ -112,25 +209,27 @@ output:
     iny
     dex
     bpl output
+    rts
+}
 
-    ; Render game mode icons.
-    ldy #HIGHSCORE_OFFSET_GAME_MODE
-    lda (source_ptr),y
-    ldy #HIGHSCORE_SCREEN_GAME_MODE_OFFSET
+; Calculate icons for game mode.
+; Arguments:
+;   A: game mode bit field
+; Result:
+;   score_icons: screen codes for shape, size, difficulty, controller
+calculate_score_icons {
     tax
     and #1
     clc
     adc #ICON_OFFSET_SHAPE
-    sta (destination_ptr),y
-    iny
+    sta score_icons
     txa
     lsr
     tax
     and #3
     clc
     adc #ICON_OFFSET_SIZE
-    sta (destination_ptr),y
-    iny
+    sta score_icons + 1
     txa
     lsr
     lsr
@@ -138,31 +237,15 @@ output:
     and #3
     clc
     adc #ICON_OFFSET_DIFFICULTY
-    sta (destination_ptr),y
-    iny
+    sta score_icons + 2
     txa
     lsr
     lsr
     and #1
     clc
     adc #ICON_OFFSET_CONTROLLER
-    sta (destination_ptr),y
-
-    ; Next entry.
-    lda source_ptr
-    clc
-    adc #16
-    cmp #.sizeof(highscore_table)
-    bne :+
+    sta score_icons + 3
     rts
-:   sta source_ptr
-    clc
-    lda destination_ptr
-    adc #40
-    sta destination_ptr
-    bcc :+
-    inc destination_ptr + 1
-:   jmp loop
 }
 
 ; Insert empty entry into high score table.
@@ -235,12 +318,12 @@ highscore_table .align $100 {
     .data "spockie      ":screen, 450:2, %00110010 ; 1
     .data "dillo        ":screen, 350:2, %00110111 ; 2
     .data "exa          ":screen, 300:2, %00000010 ; 3
-    .data "dillo        ":screen, 295:2, %00110000 ; 4
+    .data "dillo        ":screen, 295:2, %00101000 ; 4
     .data "exa          ":screen, 250:2, %00010111 ; 5
     .data "spockie      ":screen, 245:2, %00110100 ; 6
     .data "thunderblade ":screen, 200:2, %00010101 ; 7
     .data "spockie      ":screen, 190:2, %00100001 ; 8
-    .data "spockie      ":screen, 180:2, %00110110 ; 9
+    .data "spockie      ":screen, 180:2, %00101110 ; 9
     .data "thunderblade ":screen, 175:2, %00010010 ; 10
 }
 
@@ -249,4 +332,10 @@ highscore_table .align $100 {
 current_score .reserve 2
 current_game_mode .reserve 1
 
-score_digits .reserve 5
+score_digits .reserve 5 ; digits of the score, least significant digit first
+
+score_icons .reserve 4 ; screen codes for shape, size, difficulty, controller
+score_icon_shape = score_icons
+score_icon_size = score_icons + 1
+score_icon_difficulty = score_icons + 2
+score_icon_controller = score_icons + 3
