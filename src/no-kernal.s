@@ -33,7 +33,7 @@ start_of_irq {
     beq :+
     ; jmp ($0316) ; TODO: doesn't work with kernal disabled
     jmp end_of_irq
-:   jmp ($0314)
+:   jmp (IRQ_VECTOR)
 }
 
 nmi_proxy {
