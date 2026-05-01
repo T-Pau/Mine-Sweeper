@@ -53,13 +53,13 @@ score_screen
             Congratulations!
          You cleared the field.     
 
-     Time Par        □Ⓢ  2:00  
-          Played         1:25
-          Bonus           350
-          controller 🕹   *1.2  420
-     Lives           ♥♥         50
-     Difficulty      Ⅱ          *2
-     Total                     940
+    Time Par              :    
+         Used             :  
+         Bonus              0
+         controller      *1.
+    Lives
+    Difficulty                   *
+    Total
 
        Sorry, You didn't make it
           to the top sweepers.

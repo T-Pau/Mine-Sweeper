@@ -56,7 +56,7 @@ display_digit {
     tax
 load:
     lda digits_modern,x ; TODO: modern vs original
-    sta (destination_ptr),y
+    sta (irq_destination_ptr),y
     inx
     iny
     tya
@@ -261,6 +261,8 @@ sprites_done:
     ldx #$ff
     stx animation_delay
     stx animation_index
+    lda #1
+    sta in_game
 
     set_irq_table game_irq_table
     rts
@@ -345,6 +347,12 @@ column_loop:
 }
 
 game_won {
+    lda CIA1_TOD_SECONDS
+    sta time_used
+    lda CIA1_TOD_MINUTES
+    sta time_used + 1
+    lda #0
+    sta in_game
     ldy modern_mode
     beq :+
     jmp display_score
@@ -352,37 +360,19 @@ game_won {
 }
 
 game_won_original {
-    lda CIA1_TOD_SECONDS
-    tax
-    and #$f
-    ora #$30
-    sta title_screen_won + $61
-    txa
-    lsr
-    lsr
-    lsr
-    lsr
-    ora #$30
-    sta title_screen_won + $60
-    lda CIA1_TOD_MINUTES
-    tax
-    and #$f
-    ora #$30
-    sta title_screen_won + $5e
-    txa
-    lsr
-    lsr
-    lsr
-    lsr
-    ; TODO: Space instead of leading 0?
-    ora #$30
-    sta title_screen_won + $5d
+    store_word destination_ptr, title_screen_won + $5d
+    ldx time_used
+    lda time_used + 1
+    ldy #0
+    jsr print_time
     lda #<title_screen_won
     ldy #>title_screen_won
     jmp end_game
 }
 
 game_lost {
+    lda #0
+    sta in_game
     lda #<title_screen_failed
     ldy #>title_screen_failed
     jmp end_game
@@ -426,7 +416,7 @@ reset_time {
 }
 
 display_time {
-    copy_word destination_ptr, position_time
+    copy_word irq_destination_ptr, position_time
     lda CIA1_TOD_SECONDS
     and #$0f
     ldy #$20
@@ -462,14 +452,14 @@ display_time {
 }
 
 display_lives_left {
-    copy_word destination_ptr, position_lives
+    copy_word irq_destination_ptr, position_lives
     lda lives_left
     ldy #0
     jmp display_digit
 }
 
 display_mines {
-    copy_word destination_ptr, position_mines
+    copy_word irq_destination_ptr, position_mines
     ldx #DIGIT_EMPTY
     ldy modern_mode
     beq original
@@ -514,10 +504,12 @@ game_irq {
     jsr display_bottom_sprites
     jsr music_play
     inc frames
+    lda in_game
+    beq :+
     jsr display_time
     jsr handle_input
     jsr handle_animation
-    rts
+:   rts
 }
 
 start_animation {
@@ -1175,6 +1167,8 @@ animation_sprite {
 .section reserved
 
 lives_left .reserve 1
+time_used .reserve 2
+in_game .reserve 1
 
 field_position_low .reserve MAX_GAMEFIELD_SIZE
 field_position_high .reserve MAX_GAMEFIELD_SIZE

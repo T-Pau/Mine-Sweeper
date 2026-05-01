@@ -33,7 +33,9 @@ IRQ_END = $ea31
 
 source_ptr .reserve 2
 destination_ptr .reserve 2
+irq_destination_ptr .reserve 2
 tmp .reserve 1
+tmp1 = rl_tmp ; For bcd2bin.
 
 .section code
 
