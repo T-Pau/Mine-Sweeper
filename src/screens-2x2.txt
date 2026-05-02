@@ -81,7 +81,7 @@ won
                     
     You cleared     
     this field.     
-  Your Time: 01:18  
+  Your Time:   :  
                     
     A good time!    
 ---                    
