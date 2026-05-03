@@ -31,22 +31,6 @@ page_mode objects
 line_length 40
 lines 14
 ---
-menu_screen
-
-
-
-            Select Game Mode
-
-
-       (F1) Shape: {square}{hex}
-
- (F3) Size: {tiny}{small}{medium}{big}
-
- (F5) Difficulty: {easy}{normal}{hard}
-
-
-       (Space or F7) Start Game
----
 score_screen
 
 

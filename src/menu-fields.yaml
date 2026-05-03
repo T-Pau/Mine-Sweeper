@@ -1,0 +1,71 @@
+settings:
+  include_count: false
+  prefix: menu_field_
+  row_length: 4
+
+fields:
+  x: 
+    type: omit
+  y:
+    type: omit
+  address:
+    default_value: "FIELD_ADDRESS({{y}}, {{x}})"
+    type: omit
+  low:
+    default_value: "<{{address}}"
+    empty_value: 0
+  high:
+    default_value: ">{{address}}"
+    empty_value: 0
+  length:
+    empty_value: 0
+  
+structs:
+  # Shape
+  - 
+    y: 4
+    structs:
+      # Square
+      - x: 15
+        length: 10
+      # Hex
+      - x: 25
+        length: 7
+
+  # Size
+  -
+    y: 7
+    structs:
+      # Tiny
+      - x: 6
+        length: 8
+      # Small
+      - x: 14
+        length: 9
+      # Medium
+      - x: 23
+        length: 10
+      # Big
+      - x: 33
+        length: 7
+
+  # Difficulty
+  -
+    y: 10
+    structs:
+      # Easy
+      - x: 13
+        length: 8
+      # Normal
+      - x: 21
+        length: 10
+      # Hard
+      - x: 31
+        length: 8
+
+  # Start Game
+  -
+    y: 13
+    structs:
+      - x: 22
+        length: 12

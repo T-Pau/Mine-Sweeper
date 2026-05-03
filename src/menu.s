@@ -235,7 +235,7 @@ menu_toggle_field {
     ldy menu_field_length,x
     dey
 :   lda (source_ptr),y
-    eor #$80
+    eor #$40
     sta (source_ptr),y
     dey
     bpl :-
@@ -254,10 +254,18 @@ highlight_field {
     lda menu_field_high,x
     eor #>(SCREEN_RAM ^ COLOR_RAM)
     sta source_ptr + 1
+    lda source_ptr
+    sec
+    sbc #40
+    sta destination_ptr
+    lda source_ptr + 1
+    sbc #0
+    sta destination_ptr + 1
     tya
     ldy menu_field_length,x
     dey
 :   sta (source_ptr),y
+    sta (destination_ptr),y
     dey
     bpl :-
     rts
@@ -334,79 +342,7 @@ keyhandler_table_menu {
     .data launch_modern_game ; F7
 }
 
-.macro field line, row, length {
-    .data TEXT_SCREEN_START + (line * 40) + row
-    .data TEXT_SCREEN_START + (line * 40) + row + length
-}
-
 FIELD_ADDRESS(line, row) = TEXT_SCREEN_START + (line * 40) + row
-
-menu_field_low {
-    ; Shape
-    .data <FIELD_ADDRESS(5, 19)
-    .data <FIELD_ADDRESS(5, 27)
-    .data 0, 0
-
-    ; Size
-    .data <FIELD_ADDRESS(7, 12)
-    .data <FIELD_ADDRESS(7, 18)
-    .data <FIELD_ADDRESS(7, 25)
-    .data <FIELD_ADDRESS(7, 33)
-
-    ; Difficulty
-    .data <FIELD_ADDRESS(9, 18)
-    .data <FIELD_ADDRESS(9, 24)
-    .data <FIELD_ADDRESS(9, 32)
-    .data 0
-
-    ; Start Game
-    .data <FIELD_ADDRESS(12, 6)
-}
-
-menu_field_high {
-    ; Shape
-    .data >FIELD_ADDRESS(5, 19)
-    .data >FIELD_ADDRESS(5, 27)
-    .data 0, 0
-
-    ; Size
-    .data >FIELD_ADDRESS(7, 12)
-    .data >FIELD_ADDRESS(7, 18)
-    .data >FIELD_ADDRESS(7, 25)
-    .data >FIELD_ADDRESS(7, 33)
-
-    ; Difficulty
-    .data >FIELD_ADDRESS(9, 18)
-    .data >FIELD_ADDRESS(9, 24)
-    .data >FIELD_ADDRESS(9, 32)
-    .data 0
-
-    ; Start Game
-    .data >FIELD_ADDRESS(12, 6)
-}
-
-menu_field_length {
-    ; Shape
-    .data 8
-    .data 5
-    .data 0
-    .data 0
-
-    ; Size
-    .data 6
-    .data 7
-    .data 8
-    .data 5
-
-    ; Difficulty
-    .data 6
-    .data 8
-    .data 6
-    .data 0
-
-    ; Start Game
-    .data 26
-}
 
 game_config {
 .public game_shape:

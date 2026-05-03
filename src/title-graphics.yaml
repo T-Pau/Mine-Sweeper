@@ -50,7 +50,7 @@ characters:
   -
     file: charset-1x1.png
     charset: 1
-    inverted: present
+    inverted: none
   -
     file: charset-2x2.png
     charset: 2

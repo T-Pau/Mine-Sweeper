@@ -24,24 +24,55 @@
 ;  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 ;  IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-name menu_screen
-page_mode single
+page_mode objects
 
-.include "mapping-1x1.inc"
+map 'A'-'Z' $81
+map 'a'-'z' $01
+map ' '-'?' $20
+map '_' $a0
+map '{' $9e 
+map '}' $9f
+map '╭' $1e
+map '╮' $1f
+map '─' $a0
+
+; Shape
+map '□' $a1 ; square
+map '⬡' $a2 ; hex
+
+; Size
+map 'Ⓣ' $a3 ; tiny
+map 'Ⓢ' $a4 ; small
+map 'Ⓜ' $a5 ; medium
+map 'Ⓑ' $a6 ; big
+
+; Difficulty
+map 'Ⅰ' $a7 ; easy
+map 'Ⅱ' $a8 ; normal
+map 'Ⅲ' $a9 ; hard
+
+; Controller
+map '🕹' $aa ; joystick
+map '🖱' $ab ; mouse
+
+; .include "mapping-1x1.inc"
 
 line_length 40
 lines 14
 ---
+menu_screen
 
 
-            Select Game Mode
+            select game mode
 
-
-       (F1) Shape: {square}{hex}
-
- (F3) Size: {tiny}{small}{medium}{big}
-
- (F5) Difficulty: {easy}{normal}{hard}
-
-
-       (Space or F7) Start Game
+               ╭────────╮╭─────╮
+        shape: {□_SQUARE}{⬡_HEX}
+         (f1)
+      ╭──────╮╭───────╮╭────────╮╭─────╮
+size: {Ⓣ_TINY}{Ⓢ_SMALL}{Ⓜ_MEDIUM}{Ⓑ_BIG}
+(f3)
+             ╭──────╮╭────────╮╭──────╮
+ difficulty: {Ⅰ_EASY}{Ⅱ_NORMAL}{Ⅲ_HARD}
+    (f5)
+                     ╭──────────╮
+       (space or f7) {START_GAME}

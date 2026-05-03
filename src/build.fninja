@@ -19,6 +19,7 @@ sources :=
     input.s
     keyboard.s
     menu.s
+    menu-fields.s
     mine-sweeper.s
     modern-explosion.s
     music.s
@@ -29,6 +30,7 @@ sources :=
     screens-1x1.s
     screens-1x1-rl.s
     screens-2x2.s
+    screens-menu.s
     title.s
     title-graphics.s
 
@@ -47,12 +49,13 @@ build title-graphics.s: convert-characters title-graphics.yaml
 
 build game-maps.s: parallel-struct game-maps.yaml
 build attract-screens.s: parallel-struct attract-screens.yaml
-
+build menu-fields.s: parallel-struct menu-fields.yaml
 build modern-explosion.s: convert-spritesheet modern-explosion.yaml
 build help-screens.s: convert-screens help-screens.txt
 build screens-1x1.s: convert-screens screens-1x1.txt
 build screens-1x1-rl.s: convert-screens screens-1x1-rl.txt
 build screens-2x2.s: convert-screens screens-2x2.txt
+build screens-menu.s: convert-screens screens-menu.txt
 build pointer-title.s: convert-sprites pointer.png
     flags = --section graphics_title --align
     name = title_pointer_sprite
