@@ -9,6 +9,7 @@ sources :=
     game.s
     gamefield.s
     game-bitmap.s
+    game-end.s
     game-graphics.s
     game-maps.s
     game-screen.s

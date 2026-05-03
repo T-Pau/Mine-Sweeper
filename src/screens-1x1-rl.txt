@@ -45,5 +45,5 @@ score_screen
     Difficulty                   *
     Total
 
-       Sorry, You didn't make it
-          to the top sweepers.
+  Sorry, you didn't make a highscore.
+         Press Space or Fire.

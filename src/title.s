@@ -139,7 +139,6 @@ title_delay {
 :   jmp activate_next_bottom_action
 }
 
-
 .section data
 
 irq_table_title {

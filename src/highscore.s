@@ -198,7 +198,7 @@ live_loop:
     jsr setup_title
     lda #CHARSET_1x1
     sta text_charset
-    jmp setup_attract_fade
+    jmp setup_game_end
 }
 
 ; Display time.
